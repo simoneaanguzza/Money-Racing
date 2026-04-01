@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0a0a0a"/>
+<title>WealthPilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ── Variables ── */
+:root {
+  --bg:        #080808;
+  --s1:        #111111;
+  --s2:        #181818;
+  --s3:        #202020;
+  --s4:        #282828;
+  --b1:        #2a2a2a;
+  --b2:        #363636;
+  --b3:        #444444;
+  --gold:      #c9a84c;
+  --gold2:     #e8c96a;
+  --gold3:     #f0dfa8;
+  --gd:        rgba(201,168,76,.14);
+  --gb:        rgba(201,168,76,.4);
+  --t1:        #ebe9e3;
+  --t2:        #9b968f;
+  --t3:        #575350;
+  --green:     #4caf7d;
+  --gn:        rgba(76,175,125,.15);
+  --red:       #e05c5c;
+  --rn:        rgba(224,92,92,.15);
+  --amber:     #e8a44a;
+  --blue:      #5b8dee;
+  --r:         10px;
+  --rl:        14px;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+h1,h2,h3,.syne { font-family: 'Syne', sans-serif; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ═══ TOP NAV ═══ */
+#topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: var(--s1);
+  border-bottom: 1px solid var(--b1);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  z-index: 100;
+  padding: 0 16px;
+}
+
+/* Logo */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 20px;
+  border-right: 1px solid var(--b1);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.nav-logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 13px; color: #000;
+  box-shadow: 0 0 12px rgba(201,168,76,.3);
+  flex-shrink: 0;
+}
+.nav-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 14px;
+  color: var(--gold2);
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+
+/* Nav links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--t3);
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  transition: all .15s;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.nav-link:hover {
+  color: var(--t2);
+  background: var(--s2);
+}
+.nav-link.active {
+  color: var(--gold2);
+  background: var(--gd);
+  border-color: var(--gb);
+  font-weight: 500;
+}
+.nav-link .nl-icon { font-size: 13px; opacity: .8; }
+.nav-link.active .nl-icon { opacity: 1; }
+
+/* Nav group label */
+.nav-sep {
+  width: 1px; height: 20px;
+  background: var(--b1);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+.nav-group-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: var(--t3);
+  text-transform: uppercase;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+/* Topbar right */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--b1);
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.nav-page-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--t1);
+}
+
+/* ═══ MOBILE BOTTOM NAV ═══ */
+#bottomnav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 62px;
+  background: var(--s1);
+  border-top: 1px solid var(--b2);
+  z-index: 100;
+}
+.bn-inner {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+}
+.bn-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: var(--t3);
+  transition: color .15s;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .3px;
+  padding: 6px 4px;
+  border-top: 2px solid transparent;
+}
+.bn-item.active {
+  color: var(--gold2);
+  border-top-color: var(--gold);
+}
+.bn-item .bn-icon { font-size: 19px; line-height: 1; }
+
+/* ═══ MAIN CONTENT ═══ */
+#main {
+  position: fixed;
+  top: 56px; left: 0; right: 0; bottom: 0;
+  overflow-y: auto;
+  background: var(--bg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--b2) transparent;
+}
+#content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+#topbar-actions {
+  position: fixed;
+  top: 0; right: 16px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 101;
+}
+
+/* ═══ COMPONENTS ═══ */
+
+/* Cards */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--b1);
+  border-radius: var(--rl);
+  padding: 20px;
+}
+.card + .card { margin-top: 16px; }
+.card-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--t1);
+}
+.card-sub { font-size: 12px; color: var(--t3); margin-top: 2px; }
+
+/* Grid */
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+.g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.g1 { margin-bottom: 16px; }
+
+/* Metric cards */
+.mc {
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  border-radius: var(--r);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.mc.gold {
+  border-color: var(--gb);
+  background: linear-gradient(135deg, rgba(201,168,76,.1), rgba(201,168,76,.04));
+}
+.mc .ml { font-size: 11px; color: var(--t3); letter-spacing: .6px; text-transform: uppercase; font-weight: 500; margin-bottom: 7px; }
+.mc .mv { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 500; color: var(--t1); line-height: 1.1; }
+.mc .mv.g { color: var(--green); }
+.mc .mv.r { color: var(--red); }
+.mc .mv.au { color: var(--gold2); }
+.mc .ms { font-size: 11px; color: var(--t3); margin-top: 4px; }
+.mc .ms .p { color: var(--green); }
+.mc .ms .n { color: var(--red); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px; font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+.btn-gold { background: linear-gradient(135deg,var(--gold),var(--gold2)); color: #000; font-weight: 600; }
+.btn-gold:hover { opacity: .88; transform: translateY(-1px); }
+.btn-ghost { background: transparent; border: 1px solid var(--b2); color: var(--t2); }
+.btn-ghost:hover { background: var(--s3); color: var(--t1); }
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+
+/* Table */
+.tw { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 9px 12px; font-size: 10.5px; font-weight: 600; letter-spacing: .8px; color: var(--t3); border-bottom: 1px solid var(--b1); text-transform: uppercase; }
+td { padding: 11px 12px; font-size: 13px; border-bottom: 1px solid var(--b1); color: var(--t1); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--s2); }
+.tm { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.bg  { background: var(--gn); color: var(--green); border: 1px solid rgba(76,175,125,.25); }
+.br  { background: var(--rn); color: var(--red); border: 1px solid rgba(224,92,92,.25); }
+.bau { background: var(--gd); color: var(--gold2); border: 1px solid var(--gb); }
+.bb  { background: rgba(91,141,238,.12); color: var(--blue); border: 1px solid rgba(91,141,238,.25); }
+.bgr { background: var(--s3); color: var(--t2); border: 1px solid var(--b1); }
+
+/* Progress */
+.pw { height: 5px; background: var(--s3); border-radius: 3px; overflow: hidden; }
+.pw.h8 { height: 8px; }
+.pb { height: 100%; border-radius: 3px; transition: width .4s ease; }
+.pb-g { background: var(--green); }
+.pb-r { background: var(--red); }
+.pb-au { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+
+/* Modal */
+.mbg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.8);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+.modal {
+  background: var(--s1);
+  border: 1px solid var(--b2);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,.8);
+}
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 17px;
+  color: var(--gold2);
+  margin-bottom: 20px;
+}
+.mf { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--b1); }
+
+/* Form */
+.fg { display: grid; gap: 13px; }
+.fg2 { grid-template-columns: 1fr 1fr; }
+.fg3 { grid-template-columns: 1fr 1fr 1fr; }
+.fl { font-size: 11.5px; font-weight: 500; color: var(--t2); display: block; margin-bottom: 5px; }
+.fl.g { color: var(--green); }
+.fl.r { color: var(--red); }
+.fi {
+  background: var(--s2);
+  border: 1px solid var(--b2);
+  border-radius: 8px;
+  color: var(--t1);
+  font-size: 13px;
+  padding: 8px 11px;
+  font-family: 'DM Sans', sans-serif;
+  width: 100%;
+  transition: border-color .15s;
+}
+.fi:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.12); }
+select.fi option { background: var(--s2); }
+textarea.fi { resize: vertical; min-height: 68px; }
+
+/* RR preview */
+.rr-box { padding: 9px 13px; border-radius: 8px; font-size: 12.5px; display: flex; align-items: center; gap: 7px; }
+.rr-ok { background: var(--gn); border: 1px solid rgba(76,175,125,.25); color: var(--green); }
+.rr-warn { background: rgba(232,164,74,.1); border: 1px solid rgba(232,164,74,.3); color: var(--amber); }
+
+/* Checklist */
+.ck-list { display: flex; flex-direction: column; gap: 6px; }
+.ck-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .15s;
+}
+.ck-item:hover { background: var(--s2); border-color: var(--b1); }
+.ck-item.on { background: var(--gn); border-color: rgba(76,175,125,.2); }
+.ck-box {
+  width: 17px; height: 17px; border-radius: 4px;
+  border: 1.5px solid var(--b2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  background: var(--s3);
+  transition: all .15s;
+}
+.ck-item.on .ck-box { background: var(--green); border-color: var(--green); color: #fff; }
+.ck-text { font-size: 12.5px; color: var(--t2); }
+.ck-item.on .ck-text { color: var(--t1); }
+
+/* Alert */
+.al { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border-radius: 9px; font-size: 13px; margin-bottom: 12px; }
+.al-w { background: rgba(232,164,74,.1); border: 1px solid rgba(232,164,74,.25); color: var(--amber); }
+.al-d { background: var(--rn); border: 1px solid rgba(224,92,92,.3); color: var(--red); }
+.al-s { background: var(--gn); border: 1px solid rgba(76,175,125,.25); color: var(--green); }
+
+/* Timeline */
+.tl { display: flex; flex-direction: column; gap: 6px; }
+.tl-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--b1);
+  background: var(--s2);
+  transition: all .15s;
+}
+.tl-row.cur { border-color: var(--gb); background: var(--gd); }
+.tl-row.done { opacity: .65; }
+.tl-row.lock { opacity: .4; }
+.tl-n {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  font-family: 'Syne', sans-serif;
+}
+.tl-n.cur { background: linear-gradient(135deg,var(--gold),var(--gold2)); color: #000; }
+.tl-n.done { background: var(--gn); color: var(--green); border: 1px solid rgba(76,175,125,.3); }
+.tl-n.lock { background: var(--s3); color: var(--t3); }
+.tl-info { flex: 1; min-width: 0; }
+.tl-ph { font-size: 13px; font-weight: 500; color: var(--t1); }
+.tl-row.cur .tl-ph { color: var(--gold2); }
+.tl-rules { font-size: 11px; color: var(--t3); margin-top: 1px; }
+.tl-cap { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--t2); flex-shrink: 0; }
+.tl-row.cur .tl-cap { color: var(--gold); }
+
+/* Dots */
+.dots { display: flex; gap: 3px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+
+/* Empty */
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; gap: 10px; text-align: center; }
+.empty-icon { font-size: 32px; opacity: .3; }
+.empty-t { font-size: 14px; font-weight: 500; color: var(--t2); }
+.empty-s { font-size: 12px; color: var(--t3); }
+
+/* Rule rows */
+.rule-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; background: var(--s2); border: 1px solid var(--b1); border-radius: 8px; gap: 12px; }
+.rule-icon { font-size: 14px; flex-shrink: 0; }
+.rule-txt { font-size: 13px; font-weight: 500; flex: 1; }
+.rule-act { font-size: 11.5px; color: var(--t3); text-align: right; flex-shrink: 0; }
+
+/* Page animation */
+@keyframes fadein { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+.page { animation: fadein .22s ease; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+
+/* chart wrap */
+.cw { position: relative; width: 100%; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 860px) {
+  #topnav { overflow-x: auto; }
+  .nav-links { gap: 1px; }
+  .nav-link { padding: 5px 9px; font-size: 12px; }
+  .nav-group-lbl { display: none; }
+  .nav-sep { margin: 0 3px; }
+  #main { top: 56px; bottom: 62px; }
+  #bottomnav { display: block; }
+  #topbar-actions { top: auto; bottom: 68px; right: 12px; }
+  .g4 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: 1fr 1fr; }
+  #content { padding: 14px; }
+}
+@media (max-width: 600px) {
+  .g4 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: 1fr 1fr; }
+  .g2 { grid-template-columns: 1fr; }
+  .fg2 { grid-template-columns: 1fr; }
+  .fg3 { grid-template-columns: 1fr; }
+  .nav-logo-text { display: none; }
+  .nav-logo { padding-right: 12px; margin-right: 4px; }
+  .nav-link { padding: 5px 8px; font-size: 11.5px; gap: 4px; }
+  .nav-link .nl-txt { display: none; }
+  .nav-link .nl-icon { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP NAV ═══ -->
+<nav id="topnav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">W</div>
+    <div class="nav-logo-text">WealthPilot</div>
+  </div>
+
+  <div class="nav-links" id="nav-links">
+    <div class="nav-link active" data-page="dashboard" onclick="nav('dashboard')">
+      <span class="nl-icon">◈</span><span class="nl-txt">Dashboard</span>
+    </div>
+    <div class="nav-link" data-page="budget" onclick="nav('budget')">
+      <span class="nl-icon">◉</span><span class="nl-txt">Budget</span>
+    </div>
+
+    <div class="nav-sep"></div>
+    <div class="nav-group-lbl">Trading</div>
+
+    <div class="nav-link" data-page="journal" onclick="nav('journal')">
+      <span class="nl-icon">◆</span><span class="nl-txt">Journal</span>
+    </div>
+    <div class="nav-link" data-page="stats" onclick="nav('stats')">
+      <span class="nl-icon">◇</span><span class="nl-txt">Statistiche</span>
+    </div>
+    <div class="nav-link" data-page="scalata" onclick="nav('scalata')">
+      <span class="nl-icon">▲</span><span class="nl-txt">Scalata</span>
+    </div>
+
+    <div class="nav-sep"></div>
+    <div class="nav-group-lbl">Portfolio</div>
+
+    <div class="nav-link" data-page="portfolio" onclick="nav('portfolio')">
+      <span class="nl-icon">◑</span><span class="nl-txt">Crypto/Azioni</span>
+    </div>
+    <div class="nav-link" data-page="accumulo" onclick="nav('accumulo')">
+      <span class="nl-icon">◐</span><span class="nl-txt">Accumulo</span>
+    </div>
+  </div>
+
+  <div class="nav-right" id="nav-right">
+    <span class="nav-page-title" id="nav-page-title"></span>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div id="main">
+  <div id="content"></div>
+</div>
+
+<!-- ═══ TOPBAR ACTIONS (floating) ═══ -->
+<div id="topbar-actions"></div>
+
+<!-- ═══ BOTTOM NAV (mobile) ═══ -->
+<div id="bottomnav">
+  <div class="bn-inner">
+    <div class="bn-item active" data-page="dashboard" onclick="nav('dashboard')">
+      <div class="bn-icon">◈</div><div>Home</div>
+    </div>
+    <div class="bn-item" data-page="journal" onclick="nav('journal')">
+      <div class="bn-icon">◆</div><div>Journal</div>
+    </div>
+    <div class="bn-item" data-page="scalata" onclick="nav('scalata')">
+      <div class="bn-icon">▲</div><div>Scalata</div>
+    </div>
+    <div class="bn-item" data-page="portfolio" onclick="nav('portfolio')">
+      <div class="bn-icon">◑</div><div>Portfolio</div>
+    </div>
+    <div class="bn-item" data-page="stats" onclick="nav('stats')">
+      <div class="bn-icon">◇</div><div>Stats</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL ROOT ═══ -->
+<div id="modal-root"></div>
+
+<script>
+/* ────────────────────────────────────────────────────────
+   DATA LAYER
+──────────────────────────────────────────────────────── */
+const DB = {
+  get(k){ try{ return JSON.parse(localStorage.getItem('wp3_'+k)||'null'); }catch{ return null; } },
+  set(k,v){ localStorage.setItem('wp3_'+k, JSON.stringify(v)); },
+  push(k,item){ const a=DB.get(k)||[]; a.push(item); DB.set(k,a); return a; },
+  del(k,id){ DB.set(k,(DB.get(k)||[]).filter(x=>x.id!==id)); },
+};
+
+const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+const today = () => new Date().toISOString().split('T')[0];
+const fmt = (n,d=0) => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:d,maximumFractionDigits:d}).format(n||0);
+const fmtP = n => (n>=0?'+':'')+n.toFixed(1)+'%';
+const fmtN = (n,d=2) => new Intl.NumberFormat('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n||0);
+const mname = i => ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'][i];
+
+/* ── Seed ── */
+function seed(){
+  if(DB.get('seeded')) return;
+  DB.set('seeded', true);
+  DB.set('settings', {initialCapital:3500, targetCapital:35000});
+  DB.set('budget_income', 3200);
+  DB.set('budget_cats',[
+    {id:uid(),name:'Affitto',budget:900,color:'#5b8dee'},
+    {id:uid(),name:'Spesa',budget:400,color:'#4caf7d'},
+    {id:uid(),name:'Trasporti',budget:200,color:'#c9a84c'},
+    {id:uid(),name:'Svago',budget:250,color:'#e05c5c'},
+    {id:uid(),name:'Utenze',budget:150,color:'#9b59b6'},
+    {id:uid(),name:'Altro',budget:100,color:'#888'},
+  ]);
+  DB.set('portfolio',[
+    {id:uid(),type:'crypto',name:'Bitcoin',ticker:'BTC',qty:0.05,buyPrice:42000,currentPrice:65000},
+    {id:uid(),type:'crypto',name:'Ethereum',ticker:'ETH',qty:0.8,buyPrice:2200,currentPrice:3400},
+    {id:uid(),type:'stock',name:'Apple',ticker:'AAPL',qty:5,buyPrice:170,currentPrice:198},
+    {id:uid(),type:'stock',name:'NVIDIA',ticker:'NVDA',qty:3,buyPrice:450,currentPrice:870},
+  ]);
+  DB.set('accumulo',[
+    {id:uid(),date:'2024-01-15',amount:300,asset:'ETF S&P500',note:'PAC mensile'},
+    {id:uid(),date:'2024-02-15',amount:300,asset:'ETF S&P500',note:'PAC mensile'},
+    {id:uid(),date:'2024-03-15',amount:300,asset:'ETF S&P500',note:'PAC mensile'},
+    {id:uid(),date:'2024-04-15',amount:350,asset:'ETF S&P500',note:'PAC + extra'},
+    {id:uid(),date:'2024-05-15',amount:350,asset:'ETF S&P500',note:'PAC mensile'},
+  ]);
+  const phases=['Accumulo','Markup','Distribuzione','Markup','Accumulo','Markdown','Markup','Accumulo','Distribuzione','Markup'];
+  const outs  =['WIN','WIN','LOSS','WIN','WIN','LOSS','WIN','BE','WIN','WIN'];
+  const trades=[];
+  for(let i=0;i<10;i++){
+    const w=outs[i]==='WIN';
+    const pnl=w?Math.round(28+Math.random()*90):(outs[i]==='BE'?0:Math.round(-(12+Math.random()*45)));
+    const e=2280+Math.random()*20, sl=e-5-Math.random()*8, tp=e+10+Math.random()*18;
+    trades.push({
+      id:uid(), date:`2024-0${Math.floor(i/3)+1}-${(8+i*2).toString().padStart(2,'0')}`,
+      direction:Math.random()>.4?'LONG':'SHORT',
+      wyckoffPhase:phases[i], entry:+e.toFixed(1), sl:+sl.toFixed(1), tp:+tp.toFixed(1),
+      exit:+(e+(w?5:-3)).toFixed(1), pnl,
+      rrRealized:w?+(1.4+Math.random()*2.2).toFixed(1):0.4,
+      outcome:outs[i],
+      checklist:[true,true,w,true,w,true],
+      notes:'Setup Wyckoff confermato'
+    });
+  }
+  DB.set('trades', trades);
+  const cats=DB.get('budget_cats');
+  const txs=[];
+  ['Affitto','Esselunga','Benzina','Netflix','ENEL','Amazon'].forEach((d,i)=>{
+    txs.push({id:uid(),date:`2024-04-${(3+i*4).toString().padStart(2,'0')}`,catId:cats[i]?.id||cats[0].id,desc:d,amount:Math.round((cats[i]?.budget||100)*(0.7+Math.random()*0.5))});
+  });
+  DB.set('transactions', txs);
+}
+seed();
+
+/* ────────────────────────────────────────────────────────
+   ROUTER
+──────────────────────────────────────────────────────── */
+let currentPage = 'dashboard';
+
+function nav(page){
+  currentPage = page;
+  // Highlight top nav
+  document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active', el.dataset.page===page));
+  // Highlight bottom nav
+  document.querySelectorAll('.bn-item').forEach(el=>el.classList.toggle('active', el.dataset.page===page));
+  // Page title
+  const titles={dashboard:'Dashboard',budget:'Budget Mensile',journal:'Journal Wyckoff',stats:'Statistiche Trading',scalata:'Piano Scalata',portfolio:'Portfolio',accumulo:'Piano Accumulo'};
+  document.getElementById('nav-page-title').textContent = titles[page]||'';
+  // Clear
+  document.getElementById('topbar-actions').innerHTML = '';
+  document.getElementById('content').innerHTML = '';
+  PAGES[page]();
+}
+
+/* ────────────────────────────────────────────────────────
+   MODAL
+──────────────────────────────────────────────────────── */
+function openModal(html){
+  const r=document.getElementById('modal-root');
+  r.innerHTML=`<div class="mbg" id="mbg">${html}</div>`;
+  r.querySelector('#mbg').addEventListener('click',e=>{ if(e.target.id==='mbg') closeModal(); });
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+
+/* ────────────────────────────────────────────────────────
+   CHARTS
+──────────────────────────────────────────────────────── */
+const charts={};
+function mkChart(id,cfg){
+  if(charts[id]){ charts[id].destroy(); delete charts[id]; }
+  const el=document.getElementById(id); if(!el) return;
+  charts[id]=new Chart(el,cfg); return charts[id];
+}
+const TT = { backgroundColor:'#181818', borderColor:'#2a2a2a', borderWidth:1 };
+const TX = { font:{family:"'JetBrains Mono',monospace",size:10}, color:'#575350' };
+const GR = 'rgba(42,42,42,.6)';
+
+/* ────────────────────────────────────────────────────────
+   PLAN DATA
+──────────────────────────────────────────────────────── */
+const PLAN=[
+  {m:1,ph:'Apprendimento',t:8,r:1,dd:10,tr:2,lev:'50–100x'},
+  {m:2,ph:'Apprendimento',t:8,r:1,dd:10,tr:2,lev:'50–100x'},
+  {m:3,ph:'Apprendimento',t:8,r:1,dd:10,tr:2,lev:'50–100x'},
+  {m:4,ph:'Consolidamento',t:15,r:1.5,dd:12,tr:3,lev:'100–200x'},
+  {m:5,ph:'Consolidamento',t:15,r:1.5,dd:12,tr:3,lev:'100–200x'},
+  {m:6,ph:'Consolidamento',t:15,r:1.5,dd:12,tr:3,lev:'100–200x'},
+  {m:7,ph:'Scalata',t:25,r:2,dd:15,tr:3,lev:'200–350x'},
+  {m:8,ph:'Scalata',t:25,r:2,dd:15,tr:3,lev:'200–350x'},
+  {m:9,ph:'Scalata',t:25,r:2,dd:15,tr:3,lev:'200–350x'},
+  {m:10,ph:'Obiettivo',t:30,r:2,dd:15,tr:3,lev:'350–500x'},
+  {m:11,ph:'Obiettivo',t:30,r:2,dd:15,tr:3,lev:'350–500x'},
+  {m:12,ph:'Obiettivo',t:30,r:2,dd:15,tr:3,lev:'350–500x'},
+];
+
+/* ────────────────────────────────────────────────────────
+   PAGE: DASHBOARD
+──────────────────────────────────────────────────────── */
+const PAGES={};
+PAGES.dashboard=function(){
+  const trades=DB.get('trades')||[];
+  const portfolio=DB.get('portfolio')||[];
+  const accumulo=DB.get('accumulo')||[];
+  const S=DB.get('settings')||{initialCapital:3500};
+  const txs=DB.get('transactions')||[];
+  const cats=DB.get('budget_cats')||[];
+  const income=DB.get('budget_income')||0;
+
+  const tradePnL=trades.reduce((s,t)=>s+t.pnl,0);
+  const tradeEq=(S.initialCapital||3500)+tradePnL;
+  const pVal=portfolio.reduce((s,p)=>s+p.qty*p.currentPrice,0);
+  const pCost=portfolio.reduce((s,p)=>s+p.qty*p.buyPrice,0);
+  const pPnL=pVal-pCost;
+  const accTot=accumulo.reduce((s,a)=>s+a.amount,0);
+  const totalW=tradeEq+pVal+accTot;
+  const wins=trades.filter(t=>t.pnl>0).length;
+  const wr=trades.length?Math.round(wins/trades.length*100):0;
+  const cm=new Date().getMonth();
+  const mTxs=txs.filter(t=>new Date(t.date).getMonth()===cm);
+  const mSpend=mTxs.reduce((s,t)=>s+t.amount,0);
+
+  // Equity series
+  const sOps=[...trades].sort((a,b)=>a.date.localeCompare(b.date));
+  let eq=S.initialCapital||3500;
+  const eqD=[eq], eqL=['Start'];
+  sOps.forEach(t=>{ eq+=t.pnl; eqD.push(Math.round(eq)); eqL.push(t.date.slice(5)); });
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="g4">
+      <div class="mc gold">
+        <div class="ml">Patrimonio totale</div>
+        <div class="mv au">${fmt(totalW)}</div>
+        <div class="ms">Trading + Portfolio + Accumulo</div>
+      </div>
+      <div class="mc">
+        <div class="ml">Conto trading</div>
+        <div class="mv ${tradeEq>=(S.initialCapital||3500)?'g':'r'}">${fmt(tradeEq)}</div>
+        <div class="ms">P/L: <span class="${tradePnL>=0?'p':'n'}">${tradePnL>=0?'+':''}${fmt(tradePnL)}</span></div>
+      </div>
+      <div class="mc">
+        <div class="ml">Portfolio mercati</div>
+        <div class="mv">${fmt(pVal)}</div>
+        <div class="ms">P/L: <span class="${pPnL>=0?'p':'n'}">${pPnL>=0?'+':''}${fmt(pPnL)}</span></div>
+      </div>
+      <div class="mc">
+        <div class="ml">Win rate trading</div>
+        <div class="mv ${wr>=60?'g':''}">${wr>0?wr+'%':'—'}</div>
+        <div class="ms">${wins}W · ${trades.length-wins}L · ${trades.length} trade</div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Curva capitale — Trading</div><div class="card-sub">vs obiettivo 35.000 €</div></div>
+        </div>
+        <div class="cw" style="height:200px"><canvas id="eq-c"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Composizione patrimonio</div></div>
+        <div class="cw" style="height:200px"><canvas id="comp-c"></canvas></div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">Ultimi trade</div>
+          <button class="btn btn-ghost btn-sm" onclick="nav('journal')">Tutti →</button>
+        </div>
+        <div class="tw"><table>
+          <thead><tr><th>Data</th><th>Dir.</th><th>Fase</th><th>Esito</th><th>P/L</th></tr></thead>
+          <tbody>${trades.slice(-5).reverse().map(t=>`<tr>
+            <td style="color:var(--t3)">${t.date.slice(5)}</td>
+            <td><span class="badge ${t.direction==='LONG'?'bg':'br'}">${t.direction}</span></td>
+            <td style="font-size:12px;color:var(--t2)">${t.wyckoffPhase||'—'}</td>
+            <td><span class="badge ${t.outcome==='WIN'?'bg':t.outcome==='LOSS'?'br':'bgr'}">${t.outcome}</span></td>
+            <td class="tm" style="color:${t.pnl>=0?'var(--green)':'var(--red)'}">${t.pnl>=0?'+':''}${fmt(t.pnl)}</td>
+          </tr>`).join('')||'<tr><td colspan="5"><div class="empty"><div class="empty-s">Nessun trade</div></div></td></tr>'}</tbody>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">Budget — mese corrente</div>
+          <button class="btn btn-ghost btn-sm" onclick="nav('budget')">Dettagli →</button>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <span style="font-size:12px;color:var(--t2)">Speso</span>
+            <span class="mono" style="font-size:14px">${fmt(mSpend)} <span style="color:var(--t3);font-size:12px">/ ${fmt(income)}</span></span>
+          </div>
+          <div class="pw h8" style="margin-bottom:14px">
+            <div class="pb ${mSpend>income?'pb-r':'pb-au'}" style="width:${Math.min(100,income?Math.round(mSpend/income*100):0)}%"></div>
+          </div>
+          ${cats.slice(0,5).map(c=>{
+            const sp=mTxs.filter(t=>t.catId===c.id).reduce((s,t)=>s+t.amount,0);
+            const pct=c.budget>0?Math.min(100,Math.round(sp/c.budget*100)):0;
+            return`<div style="margin-bottom:9px">
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px">
+                <span style="color:var(--t2)">${c.name}</span>
+                <span class="mono" style="color:${pct>100?'var(--red)':'var(--t2)'}">${fmt(sp)}</span>
+              </div>
+              <div class="pw"><div class="pb" style="width:${pct}%;background:${c.color}"></div></div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  // Equity chart
+  mkChart('eq-c',{type:'line',data:{labels:eqL,datasets:[
+    {label:'Capitale',data:eqD,borderColor:'#c9a84c',borderWidth:2,pointRadius:eqD.length>15?0:3,pointBackgroundColor:eqD.map((v,i)=>i===0?'#888':v>=(S.initialCapital||3500)?'#4caf7d':'#e05c5c'),tension:.35,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(201,168,76,.2)');g.addColorStop(1,'rgba(201,168,76,0)');return g;}},
+    {label:'Target',data:eqL.map(()=>35000),borderColor:'#4caf7d',borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>'€ '+Math.round(c.parsed.y).toLocaleString('it-IT')}}},scales:{x:{ticks:TX,grid:{color:GR}},y:{ticks:{...TX,callback:v=>'€'+(v/1000).toFixed(0)+'k'},grid:{color:GR}}}}});
+
+  mkChart('comp-c',{type:'doughnut',data:{labels:['Trading','Portfolio','Accumulo'],datasets:[{data:[Math.max(0,tradeEq),pVal,accTot],backgroundColor:['#c9a84c','#5b8dee','#4caf7d'],borderColor:'#111',borderWidth:3,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{color:'#9b968f',font:{family:"'DM Sans',sans-serif",size:12},padding:14,usePointStyle:true,pointStyle:'circle'}},tooltip:{...TT,callbacks:{label:c=>`${c.label}: ${fmt(c.parsed)}`}}}}});
+};
+
+/* ────────────────────────────────────────────────────────
+   PAGE: BUDGET
+──────────────────────────────────────────────────────── */
+PAGES.budget=function(){
+  const cats=DB.get('budget_cats')||[];
+  const txs=DB.get('transactions')||[];
+  const income=DB.get('budget_income')||0;
+  const cm=new Date().getMonth();
+  const mTxs=txs.filter(t=>new Date(t.date).getMonth()===cm);
+  const totalS=mTxs.reduce((s,t)=>s+t.amount,0);
+  const saved=income-totalS;
+
+  document.getElementById('topbar-actions').innerHTML=`
+    <button class="btn btn-ghost btn-sm" onclick="editIncome()">Modifica entrate</button>
+    <button class="btn btn-gold btn-sm" onclick="addTx()">+ Transazione</button>`;
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="g3">
+      <div class="mc gold"><div class="ml">Entrate mensili</div><div class="mv au">${fmt(income)}</div></div>
+      <div class="mc"><div class="ml">Spese totali</div><div class="mv ${totalS>income?'r':''}">${fmt(totalS)}</div><div class="ms">${income?Math.round(totalS/income*100):0}% del reddito</div></div>
+      <div class="mc"><div class="ml">Risparmio</div><div class="mv ${saved>=0?'g':'r'}">${fmt(saved)}</div></div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">Categorie</div>
+          <button class="btn btn-ghost btn-sm" onclick="addCat()">+ Categoria</button>
+        </div>
+        ${cats.length?cats.map(c=>{
+          const sp=mTxs.filter(t=>t.catId===c.id).reduce((s,t)=>s+t.amount,0);
+          const pct=c.budget>0?Math.min(100,Math.round(sp/c.budget*100)):0;
+          const ov=sp>c.budget;
+          return`<div style="margin-bottom:13px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="width:10px;height:10px;border-radius:50%;background:${c.color};flex-shrink:0;display:inline-block"></span>
+                <span style="font-size:13px;font-weight:500">${c.name}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="mono" style="font-size:12.5px;color:${ov?'var(--red)':'var(--t2)'}">
+                  ${fmt(sp)} <span style="color:var(--t3)">/ ${fmt(c.budget)}</span>
+                </span>
+                ${ov?'<span class="badge br">Over</span>':''}
+                <button onclick="delCat('${c.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px;padding:2px;line-height:1">×</button>
+              </div>
+            </div>
+            <div class="pw"><div class="pb" style="width:${pct}%;background:${ov?'var(--red)':c.color}"></div></div>
+          </div>`;
+        }).join(''):`<div class="empty"><div class="empty-s">Aggiungi categorie</div></div>`}
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Distribuzione spese</div></div>
+        <div class="cw" style="height:220px"><canvas id="bud-c"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Transazioni</div>
+        <button class="btn btn-gold btn-sm" onclick="addTx()">+ Aggiungi</button>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Data</th><th>Descrizione</th><th>Categoria</th><th>Importo</th><th></th></tr></thead>
+        <tbody>${[...mTxs].sort((a,b)=>b.date.localeCompare(a.date)).map(t=>{
+          const cat=cats.find(c=>c.id===t.catId);
+          return`<tr>
+            <td style="color:var(--t3)">${t.date}</td>
+            <td>${t.desc}</td>
+            <td style="font-size:12px"><span style="display:inline-flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:${cat?.color||'#888'};display:inline-block"></span>${cat?.name||'—'}</span></td>
+            <td class="tm" style="color:var(--red)">-${fmt(t.amount)}</td>
+            <td><button onclick="delTx('${t.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px">×</button></td>
+          </tr>`;
+        }).join('')||'<tr><td colspan="5"><div class="empty"><div class="empty-s">Nessuna transazione questo mese</div></div></td></tr>'}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+
+  if(cats.length){
+    const sp=cats.map(c=>mTxs.filter(t=>t.catId===c.id).reduce((s,t)=>s+t.amount,0));
+    mkChart('bud-c',{type:'doughnut',data:{labels:cats.map(c=>c.name),datasets:[{data:sp,backgroundColor:cats.map(c=>c.color),borderColor:'#111',borderWidth:3,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{color:'#9b968f',font:{size:11},padding:8,usePointStyle:true,pointStyle:'circle'}},tooltip:{...TT,callbacks:{label:c=>`${c.label}: ${fmt(c.parsed)}`}}}}});
+  }
+};
+
+function addTx(){
+  const cats=DB.get('budget_cats')||[];
+  openModal(`<div class="modal"><div class="modal-title">Nuova transazione</div>
+    <div class="fg" style="gap:13px">
+      <div class="fg fg2">
+        <div><label class="fl">Data</label><input type="date" id="tx-d" class="fi" value="${today()}"></div>
+        <div><label class="fl">Importo (€)</label><input type="number" id="tx-a" class="fi" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div><label class="fl">Descrizione</label><input type="text" id="tx-ds" class="fi" placeholder="es. Esselunga"></div>
+      <div><label class="fl">Categoria</label><select id="tx-c" class="fi">${cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveTx()">Salva</button></div>
+  </div>`);
+}
+function saveTx(){
+  const d=document.getElementById('tx-d').value, a=parseFloat(document.getElementById('tx-a').value), ds=document.getElementById('tx-ds').value, c=document.getElementById('tx-c').value;
+  if(!d||!a||!ds)return;
+  DB.push('transactions',{id:uid(),date:d,amount:a,desc:ds,catId:c});
+  closeModal(); nav('budget');
+}
+function delTx(id){ DB.del('transactions',id); nav('budget'); }
+function addCat(){
+  openModal(`<div class="modal"><div class="modal-title">Nuova categoria</div>
+    <div class="fg">
+      <div><label class="fl">Nome</label><input type="text" id="cn" class="fi" placeholder="es. Abbonamenti"></div>
+      <div><label class="fl">Budget mensile (€)</label><input type="number" id="cb" class="fi" placeholder="0"></div>
+      <div><label class="fl">Colore</label><input type="color" id="cc" class="fi" value="#c9a84c" style="height:40px;cursor:pointer"></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveCat()">Salva</button></div>
+  </div>`);
+}
+function saveCat(){ const n=document.getElementById('cn').value,b=parseFloat(document.getElementById('cb').value),c=document.getElementById('cc').value; if(!n||!b)return; DB.push('budget_cats',{id:uid(),name:n,budget:b,color:c}); closeModal(); nav('budget'); }
+function delCat(id){ DB.del('budget_cats',id); nav('budget'); }
+function editIncome(){
+  openModal(`<div class="modal"><div class="modal-title">Entrate mensili</div>
+    <div><label class="fl">Importo netto (€)</label><input type="number" id="inc" class="fi" value="${DB.get('budget_income')||0}" step="100"></div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveIncome()">Salva</button></div>
+  </div>`);
+}
+function saveIncome(){ DB.set('budget_income',parseFloat(document.getElementById('inc').value)||0); closeModal(); nav('budget'); }
+
+/* ────────────────────────────────────────────────────────
+   PAGE: JOURNAL
+──────────────────────────────────────────────────────── */
+const CK_LABELS=['4H conferma la direzione','Spring / Upthrust sul 15M','Volume anomalo presente','Orario ad alto volume (09-11, 15:30-17:30)','R/R minimo 1:2','SL definito prima di entrare'];
+let tradeChecklist=Array(6).fill(false);
+
+PAGES.journal=function(){
+  const trades=DB.get('trades')||[];
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-gold btn-sm" onclick="addTrade()">+ Nuovo trade</button>`;
+  const sorted=[...trades].sort((a,b)=>b.date.localeCompare(a.date));
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Storico trade — Wyckoff Journal</div>
+        <span style="font-size:12px;color:var(--t3)">${trades.length} operazioni</span>
+      </div>
+      ${sorted.length===0?`<div class="empty"><div class="empty-icon">◆</div><div class="empty-t">Nessun trade registrato</div><div class="empty-s">Aggiungi il primo trade con il pulsante in alto a destra</div></div>`:`
+      <div class="tw"><table>
+        <thead><tr><th>Data</th><th>Dir.</th><th>Fase Wyckoff</th><th>Entry</th><th>SL</th><th>TP</th><th>R/R</th><th>P/L</th><th>Esito</th><th>CK</th><th></th></tr></thead>
+        <tbody>${sorted.map(t=>{
+          const ck=t.checklist?t.checklist.filter(Boolean).length:0;
+          return`<tr>
+            <td style="color:var(--t3);white-space:nowrap">${t.date}</td>
+            <td><span class="badge ${t.direction==='LONG'?'bg':'br'}">${t.direction}</span></td>
+            <td style="font-size:12px;color:var(--t2)">${t.wyckoffPhase||'—'}</td>
+            <td class="tm">$${(t.entry||0).toFixed(1)}</td>
+            <td class="tm" style="color:var(--red)">$${(t.sl||0).toFixed(1)}</td>
+            <td class="tm" style="color:var(--green)">$${(t.tp||0).toFixed(1)}</td>
+            <td class="tm">${t.rrRealized?t.rrRealized.toFixed(1):'—'}</td>
+            <td class="tm" style="color:${t.pnl>=0?'var(--green)':'var(--red)'};font-weight:500">${t.pnl>=0?'+':''}${fmt(t.pnl)}</td>
+            <td><span class="badge ${t.outcome==='WIN'?'bg':t.outcome==='LOSS'?'br':'bgr'}">${t.outcome}</span></td>
+            <td>
+              <div class="dots">${Array(6).fill(0).map((_,i)=>`<div class="dot" style="background:${t.checklist&&t.checklist[i]?'var(--green)':'var(--s4)'}"></div>`).join('')}</div>
+              <div style="font-size:10px;color:var(--t3);margin-top:2px">${ck}/6</div>
+            </td>
+            <td><button onclick="delTrade('${t.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;line-height:1">×</button></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>`}
+    </div>
+  </div>`;
+};
+
+function addTrade(){
+  tradeChecklist=Array(6).fill(false);
+  openModal(`<div class="modal" style="max-width:560px"><div class="modal-title">◆ Nuovo trade — Wyckoff</div>
+    <div class="fg" style="gap:14px">
+      <div class="fg fg3">
+        <div><label class="fl">Data</label><input type="date" id="td" class="fi" value="${today()}"></div>
+        <div><label class="fl">Direzione</label><select id="tdir" class="fi"><option value="LONG">Long</option><option value="SHORT">Short</option></select></div>
+        <div><label class="fl">Fase Wyckoff (4H)</label><select id="tph" class="fi"><option>Accumulo</option><option>Markup</option><option>Distribuzione</option><option>Markdown</option></select></div>
+      </div>
+      <div class="fg fg3">
+        <div><label class="fl">Entrata ($)</label><input type="number" id="te" class="fi" placeholder="2283" step="0.1" oninput="updRR()"></div>
+        <div><label class="fl r">Stop Loss ($)</label><input type="number" id="tsl" class="fi" placeholder="2278" step="0.1" oninput="updRR()"></div>
+        <div><label class="fl g">Take Profit ($)</label><input type="number" id="ttp" class="fi" placeholder="2295" step="0.1" oninput="updRR()"></div>
+      </div>
+      <div id="rr-p"></div>
+      <div class="fg fg3">
+        <div><label class="fl">Uscita ($)</label><input type="number" id="tex" class="fi" placeholder="opz." step="0.1"></div>
+        <div><label class="fl">P/L (€)</label><input type="number" id="tpnl" class="fi" placeholder="+48 o -22" step="0.01"></div>
+        <div><label class="fl">Esito</label><select id="tout" class="fi"><option value="WIN">Win</option><option value="LOSS">Loss</option><option value="BE">Break-even</option></select></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <label class="fl" style="margin:0">Checklist pre-trade</label>
+          <span id="ck-sc" style="font-size:12px;color:var(--t3)">0/6</span>
+        </div>
+        <div class="ck-list" id="ck-list">
+          ${CK_LABELS.map((lbl,i)=>`<div class="ck-item" id="cki${i}" onclick="togCk(${i})">
+            <div class="ck-box" id="ckb${i}">✓</div>
+            <span class="ck-text">${lbl}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div><label class="fl">Note</label><textarea id="tn" class="fi" placeholder="Es: spring confermata sul 15M con spike di volume alle 10:15..."></textarea></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveTrade()">Registra trade</button></div>
+  </div>`);
+  updRR();
+}
+
+function togCk(i){
+  tradeChecklist[i]=!tradeChecklist[i];
+  document.getElementById('cki'+i).classList.toggle('on', tradeChecklist[i]);
+  const b=document.getElementById('ckb'+i);
+  b.style.background=tradeChecklist[i]?'var(--green)':'var(--s3)';
+  b.style.borderColor=tradeChecklist[i]?'var(--green)':'var(--b2)';
+  const sc=tradeChecklist.filter(Boolean).length;
+  const el=document.getElementById('ck-sc');
+  el.textContent=sc+'/6';
+  el.style.color=sc>=5?'var(--green)':sc>=3?'var(--amber)':'var(--t3)';
+}
+
+function updRR(){
+  const e=parseFloat(document.getElementById('te')?.value||0);
+  const s=parseFloat(document.getElementById('tsl')?.value||0);
+  const t=parseFloat(document.getElementById('ttp')?.value||0);
+  const el=document.getElementById('rr-p'); if(!el) return;
+  if(!e||!s||!t){ el.innerHTML=''; return; }
+  const risk=Math.abs(e-s), rew=Math.abs(t-e), rr=risk>0?rew/risk:0;
+  el.innerHTML=`<div class="rr-box ${rr>=2?'rr-ok':'rr-warn'}">${rr>=2?'✓':'⚠'} R/R pianificato: <strong>${rr.toFixed(2)}</strong>${rr<2?' — sotto il minimo 1:2':''}</div>`;
+}
+
+function saveTrade(){
+  const date=document.getElementById('td').value;
+  if(!date) return;
+  const entry=parseFloat(document.getElementById('te').value)||0;
+  const sl=parseFloat(document.getElementById('tsl').value)||0;
+  const tp=parseFloat(document.getElementById('ttp').value)||0;
+  const risk=Math.abs(entry-sl), rew=Math.abs(tp-entry);
+  DB.push('trades',{
+    id:uid(), date, direction:document.getElementById('tdir').value,
+    wyckoffPhase:document.getElementById('tph').value,
+    entry, sl, tp, exit:parseFloat(document.getElementById('tex').value)||0,
+    pnl:parseFloat(document.getElementById('tpnl').value)||0,
+    rrRealized:risk>0?parseFloat((rew/risk).toFixed(2)):0,
+    outcome:document.getElementById('tout').value,
+    checklist:[...tradeChecklist],
+    notes:document.getElementById('tn').value,
+  });
+  closeModal(); nav('journal');
+}
+function delTrade(id){ if(confirm('Eliminare?')){ DB.del('trades',id); nav('journal'); } }
+
+/* ────────────────────────────────────────────────────────
+   PAGE: STATS
+──────────────────────────────────────────────────────── */
+PAGES.stats=function(){
+  const trades=DB.get('trades')||[];
+  const S=DB.get('settings')||{initialCapital:3500};
+  const INIT=S.initialCapital||3500;
+  const wins=trades.filter(t=>t.pnl>0);
+  const losses=trades.filter(t=>t.pnl<0);
+  const wr=trades.length?Math.round(wins.length/trades.length*100):0;
+  const avgW=wins.length?wins.reduce((s,t)=>s+t.pnl,0)/wins.length:0;
+  const avgL=losses.length?Math.abs(losses.reduce((s,t)=>s+t.pnl,0))/losses.length:0;
+  const pf=avgL>0?avgW/avgL:0;
+  const avgRR=trades.filter(t=>t.rrRealized>0).length?trades.filter(t=>t.rrRealized>0).reduce((s,t)=>s+t.rrRealized,0)/trades.filter(t=>t.rrRealized>0).length:0;
+  const avgCk=trades.length?trades.reduce((s,t)=>s+(t.checklist?t.checklist.filter(Boolean).length:0),0)/trades.length:0;
+  const totalPnL=trades.reduce((s,t)=>s+t.pnl,0);
+
+  // Equity & drawdown series
+  const sOps=[...trades].sort((a,b)=>a.date.localeCompare(b.date));
+  let peak=INIT,eq=INIT,maxDD=0;
+  const eqD=[INIT],ddD=[0],labels=['Start'];
+  sOps.forEach(t=>{
+    eq+=t.pnl; eqD.push(Math.round(eq));
+    if(eq>peak)peak=eq;
+    const dd=peak>0?(peak-eq)/peak*100:0;
+    if(dd>maxDD)maxDD=dd;
+    ddD.push(parseFloat(dd.toFixed(2)));
+    labels.push(t.date.slice(5));
+  });
+
+  // Monthly
+  const monthly=Array.from({length:12},(_,i)=>{
+    const ops=trades.filter(t=>new Date(t.date).getMonth()===i);
+    return{m:mname(i),pnl:Math.round(ops.reduce((s,t)=>s+t.pnl,0)),n:ops.length};
+  });
+
+  // Wyckoff
+  const phases=['Accumulo','Markup','Distribuzione','Markdown'];
+  const wyck=phases.map(ph=>{
+    const ops=trades.filter(t=>t.wyckoffPhase===ph);
+    return{ph,pnl:Math.round(ops.reduce((s,t)=>s+t.pnl,0)),n:ops.length,wr:ops.length?Math.round(ops.filter(t=>t.pnl>0).length/ops.length*100):0};
+  });
+
+  const cm=new Date().getMonth();
+  const curP=PLAN[cm]||PLAN[0];
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    ${maxDD>=15?`<div class="al al-d">⚠ Drawdown ${maxDD.toFixed(1)}% — supera il 15%: torna alla fase precedente</div>`:''}
+    ${wr>0&&wr<55?`<div class="al al-w">Win rate ${wr}% sotto il target del 60%</div>`:''}
+
+    <div class="g4">
+      <div class="mc"><div class="ml">Win rate</div><div class="mv ${wr>=60?'g':''}">${wr>0?wr+'%':'—'}</div><div class="ms">Target ≥ 60%</div></div>
+      <div class="mc"><div class="ml">Profit factor</div><div class="mv ${pf>=2?'g':''}">${pf>0?pf.toFixed(2):'N/A'}</div><div class="ms">Target ≥ 2.0</div></div>
+      <div class="mc"><div class="ml">Drawdown max</div><div class="mv ${maxDD<10?'g':maxDD<15?'':'r'}">${maxDD.toFixed(1)}%</div><div class="ms">Limite: ${curP.dd}%</div></div>
+      <div class="mc"><div class="ml">R/R medio</div><div class="mv ${avgRR>=2?'g':''}">${avgRR>0?avgRR.toFixed(2):'—'}</div><div class="ms">Target ≥ 2.0</div></div>
+    </div>
+
+    <!-- Rule health -->
+    <div class="card g1">
+      <div class="card-hd"><div class="card-title">Salute operativa</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        ${[
+          {lbl:'Win rate',v:wr,t:60,u:'%',inv:false},
+          {lbl:'R/R medio',v:avgRR,t:2,u:'',inv:false},
+          {lbl:'Drawdown max',v:maxDD,t:curP.dd,u:'%',inv:true},
+          {lbl:'Checklist media',v:parseFloat(avgCk.toFixed(1)),t:5,u:'/6',inv:false},
+        ].map(({lbl,v,t,u,inv})=>{
+          const ok=inv?v<=t:v>=t;
+          const pct=Math.min(100,inv?(v<=t?100:Math.round(t/v*100)):Math.round(v/t*100));
+          return`<div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--t2)">${lbl}</span>
+              <span class="mono" style="color:${ok?'var(--green)':'var(--red)'}">${v.toFixed(1)}${u} <span style="color:var(--t3)">/ ${t}${u}</span></span>
+            </div>
+            <div class="pw"><div class="pb ${ok?'pb-g':'pb-r'}" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Curva capitale</div></div>
+        <div class="cw" style="height:200px"><canvas id="st-eq"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Drawdown nel tempo</div></div>
+        <div class="cw" style="height:200px"><canvas id="st-dd"></canvas></div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">P/L mensile</div></div>
+        <div class="cw" style="height:180px"><canvas id="st-m"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Per fase Wyckoff</div></div>
+        ${wyck.map(w=>`<div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div style="display:flex;align-items:center;gap:7px">
+              <span style="font-size:13px;font-weight:500">${w.ph}</span>
+              <span style="font-size:11px;color:var(--t3)">${w.n} op · ${w.wr}% WR</span>
+            </div>
+            <span class="mono" style="font-size:12.5px;color:${w.pnl>=0?'var(--green)':'var(--red)'}">${w.pnl>=0?'+':''}${fmt(w.pnl)}</span>
+          </div>
+          <div class="pw"><div class="pb" style="width:${w.n>0?Math.min(100,Math.abs(w.pnl)/150*100):0}%;background:${w.pnl>=0?'var(--green)':'var(--red)'}"></div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Dettaglio</div></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        ${[
+          {l:'Trade totali',v:trades.length},
+          {l:'Vincenti',v:wins.length,c:'var(--green)'},
+          {l:'Perdenti',v:losses.length,c:'var(--red)'},
+          {l:'Media vincita',v:fmt(avgW),c:'var(--green)'},
+          {l:'Media perdita',v:fmt(avgL),c:'var(--red)'},
+          {l:'P/L totale',v:fmt(totalPnL),c:totalPnL>=0?'var(--green)':'var(--red)'},
+        ].map(({l,v,c})=>`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:11px 13px">
+          <div style="font-size:11px;color:var(--t3);margin-bottom:3px">${l}</div>
+          <div class="mono" style="font-size:14px;font-weight:500;color:${c||'var(--t1)'}">${v}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+
+  const lineOpts=(color,inv)=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>(inv?c.parsed.y.toFixed(2)+'%':'€ '+Math.round(c.parsed.y).toLocaleString('it-IT'))}}},scales:{x:{ticks:TX,grid:{color:GR}},y:{reverse:inv,ticks:{...TX,callback:v=>inv?v+'%':'€'+(v/1000).toFixed(0)+'k'},grid:{color:GR}}}});
+
+  mkChart('st-eq',{type:'line',data:{labels,datasets:[
+    {label:'Capitale',data:eqD,borderColor:'#c9a84c',borderWidth:2,pointRadius:eqD.length>15?0:2,tension:.35,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(201,168,76,.2)');g.addColorStop(1,'rgba(201,168,76,0)');return g;}},
+    {label:'Target',data:labels.map(()=>35000),borderColor:'#4caf7d',borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false},
+  ]},options:lineOpts('#c9a84c',false)});
+
+  mkChart('st-dd',{type:'line',data:{labels,datasets:[{label:'DD',data:ddD,borderColor:'#e05c5c',borderWidth:2,pointRadius:ddD.length>15?0:2,tension:.35,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(224,92,92,.2)');g.addColorStop(1,'rgba(224,92,92,0)');return g;}}]},options:lineOpts('#e05c5c',true)});
+
+  mkChart('st-m',{type:'bar',data:{labels:monthly.map(m=>m.m),datasets:[{data:monthly.map(m=>m.pnl),backgroundColor:monthly.map(m=>m.pnl>=0?'rgba(76,175,125,.7)':'rgba(224,92,92,.7)'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>'€ '+c.parsed.y}}},scales:{x:{ticks:TX,grid:{display:false}},y:{ticks:{...TX,callback:v=>'€'+v},grid:{color:GR}}}}});
+};
+
+/* ────────────────────────────────────────────────────────
+   PAGE: SCALATA
+──────────────────────────────────────────────────────── */
+PAGES.scalata=function(){
+  const trades=DB.get('trades')||[];
+  const S=DB.get('settings')||{initialCapital:3500,targetCapital:35000};
+  const INIT=S.initialCapital||3500, TARGET=S.targetCapital||35000;
+  const totalPnL=trades.reduce((s,t)=>s+t.pnl,0);
+  const equity=INIT+totalPnL;
+  const overall=Math.min(100,Math.max(0,Math.round((equity-INIT)/(TARGET-INIT)*100)));
+  const cm=new Date().getMonth();
+  const curP=PLAN[cm]||PLAN[0];
+  const cmOps=trades.filter(t=>new Date(t.date).getMonth()===cm);
+  const cmPnL=cmOps.reduce((s,t)=>s+t.pnl,0);
+  const prevEq=equity-cmPnL;
+  const cmTarget=prevEq*(curP.t/100);
+  const cmPct=cmTarget>0?Math.min(100,Math.round(cmPnL/cmTarget*100)):0;
+  const wins=trades.filter(t=>t.pnl>0).length;
+  const wr=trades.length?Math.round(wins/trades.length*100):0;
+  const sOps=[...trades].sort((a,b)=>a.date.localeCompare(b.date));
+  let peak=INIT,eq2=INIT,maxDD=0;
+  sOps.forEach(t=>{eq2+=t.pnl;if(eq2>peak)peak=eq2;const dd=peak>0?(peak-eq2)/peak*100:0;if(dd>maxDD)maxDD=dd;});
+
+  // Equity series
+  let eq3=INIT;
+  const eqD=[INIT],eqL=['Start'];
+  sOps.forEach(t=>{eq3+=t.pnl;eqD.push(Math.round(eq3));eqL.push(t.date.slice(5));});
+
+  const PCOL={Apprendimento:'var(--amber)',Consolidamento:'var(--blue)',Scalata:'var(--green)',Obiettivo:'var(--gold2)'};
+
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-ghost btn-sm" onclick="editSettings()">⚙ Impostazioni</button>`;
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    ${maxDD>=15?`<div class="al al-d">⚠ Drawdown ${maxDD.toFixed(1)}% — supera il 15%: torna alla fase precedente</div>`:''}
+    ${wr>0&&wr<55?`<div class="al al-w">Win rate ${wr}% sotto il 60%</div>`:''}
+
+    <!-- Hero -->
+    <div class="card g1" style="border-color:var(--gb)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:11px;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px">Progresso totale</div>
+          <div class="mono" style="font-size:30px;font-weight:500;color:var(--gold2)">${fmt(equity)}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--t3);margin-bottom:4px">Obiettivo</div>
+          <div class="mono" style="font-size:22px;color:var(--green)">${fmt(TARGET)}</div>
+        </div>
+      </div>
+      <div class="pw h8" style="margin-bottom:7px"><div class="pb pb-au" style="width:${overall}%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3)">
+        <span>${overall}% completato</span>
+        <span>Mancano ${fmt(Math.max(0,TARGET-equity))}</span>
+      </div>
+    </div>
+
+    <div class="g4">
+      <div class="mc"><div class="ml">Mese</div><div class="mv">${cm+1} <span style="font-size:13px;color:${PCOL[curP.ph]}">${curP.ph}</span></div></div>
+      <div class="mc"><div class="ml">P/L mese</div><div class="mv ${cmPnL>=0?'g':'r'}">${cmPnL>=0?'+':''}${fmt(cmPnL)}</div><div class="ms">Target: +${fmt(cmTarget)}</div></div>
+      <div class="mc"><div class="ml">Win rate</div><div class="mv ${wr>=60?'g':''}">${wr>0?wr+'%':'—'}</div></div>
+      <div class="mc"><div class="ml">Drawdown max</div><div class="mv ${maxDD<10?'g':maxDD<15?'':'r'}">${maxDD.toFixed(1)}%</div><div class="ms">Limite: ${curP.dd}%</div></div>
+    </div>
+
+    <!-- Month progress -->
+    <div class="card g1">
+      <div class="card-hd">
+        <div class="card-title">Mese ${cm+1} — ${curP.ph}</div>
+        <span class="mono" style="font-size:13px;color:${cmPct>=100?'var(--green)':'var(--t3)'}">${cmPct}%</span>
+      </div>
+      <div class="pw h8" style="margin-bottom:14px"><div class="pb ${cmPct>=100?'pb-g':'pb-au'}" style="width:${cmPct}%"></div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        ${[{l:'Target mensile',v:'+'+curP.t+'%'},{l:'Rischio/trade',v:curP.r+'%'},{l:'Max trade/giorno',v:curP.tr+''},{l:'Leva effettiva',v:curP.lev}].map(({l,v})=>`
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px">
+            <div style="font-size:10.5px;color:var(--t3);margin-bottom:3px">${l}</div>
+            <div class="mono" style="font-size:13px;font-weight:500">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Equity chart -->
+    <div class="card g1">
+      <div class="card-hd"><div class="card-title">Curva capitale vs target</div></div>
+      <div class="cw" style="height:220px"><canvas id="sc-eq"></canvas></div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="card g1">
+      <div class="card-hd"><div class="card-title">Timeline 12 mesi</div></div>
+      <div class="tl">${(()=>{let c=INIT;return PLAN.map(p=>{
+        c=Math.round(c*(1+p.t/100));
+        const isCur=p.m===cm+1, isPast=p.m<cm+1;
+        return`<div class="tl-row ${isCur?'cur':isPast?'done':'lock'}">
+          <div class="tl-n ${isCur?'cur':isPast?'done':'lock'}">${isPast?'✓':isCur?p.m:'🔒'}</div>
+          <div class="tl-info">
+            <div class="tl-ph">${p.ph} — Mese ${p.m}</div>
+            <div class="tl-rules">+${p.t}% · ${p.r}% rischio · DD&lt;${p.dd}% · ${p.tr} trade/g · ${p.lev}</div>
+          </div>
+          <div class="tl-cap">${fmt(c)}</div>
+        </div>`;
+      }).join('');})()}</div>
+    </div>
+
+    <!-- Rules -->
+    <div class="card g1">
+      <div class="card-hd"><div class="card-title">Regole di protezione</div></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${[
+          {r:'Drawdown giornaliero > 5%',a:'Stop trading per oggi',i:'🛑'},
+          {r:'Drawdown settimanale > 10%',a:'Stop 48 ore',i:'⚠️'},
+          {r:'Drawdown mensile > 15%',a:'Torna alla fase precedente',i:'⚠️'},
+          {r:'2 loss consecutivi',a:'Pausa obbligatoria',i:'⏸️'},
+          {r:'Trade senza SL',a:'Vietato — chiudi subito',i:'🚫'},
+          {r:'Profitti mensili',a:'Preleva il 10–15% ogni mese',i:'✅'},
+        ].map(({r,a,i})=>`<div class="rule-row"><span class="rule-icon">${i}</span><span class="rule-txt">${r}</span><span class="rule-act">${a}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--t3);padding:14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;margin-bottom:8px">
+      ⚠ Piano a scopo educativo. Il trading con leva 500 comporta rischi molto elevati. Puoi perdere l'intero capitale. Non è un consiglio finanziario.
+    </div>
+  </div>`;
+
+  mkChart('sc-eq',{type:'line',data:{labels:eqL,datasets:[
+    {label:'Capitale',data:eqD,borderColor:'#c9a84c',borderWidth:2,pointRadius:eqD.length>15?0:3,tension:.35,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,220);g.addColorStop(0,'rgba(201,168,76,.22)');g.addColorStop(1,'rgba(201,168,76,0)');return g;}},
+    {label:'Target',data:eqL.map(()=>35000),borderColor:'#4caf7d',borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>'€ '+Math.round(c.parsed.y).toLocaleString('it-IT')}}},scales:{x:{ticks:TX,grid:{color:GR}},y:{ticks:{...TX,callback:v=>'€'+(v/1000).toFixed(0)+'k'},grid:{color:GR}}}}});
+};
+
+function editSettings(){
+  const s=DB.get('settings')||{initialCapital:3500,targetCapital:35000};
+  openModal(`<div class="modal"><div class="modal-title">⚙ Impostazioni</div>
+    <div class="fg">
+      <div><label class="fl">Capitale iniziale (€)</label><input type="number" id="si" class="fi" value="${s.initialCapital}"></div>
+      <div><label class="fl">Obiettivo (€)</label><input type="number" id="st" class="fi" value="${s.targetCapital}"></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveSettings()">Salva</button></div>
+  </div>`);
+}
+function saveSettings(){
+  DB.set('settings',{initialCapital:parseFloat(document.getElementById('si').value)||3500,targetCapital:parseFloat(document.getElementById('st').value)||35000});
+  closeModal(); nav('scalata');
+}
+
+/* ────────────────────────────────────────────────────────
+   PAGE: PORTFOLIO
+──────────────────────────────────────────────────────── */
+PAGES.portfolio=function(){
+  const P=DB.get('portfolio')||[];
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-gold btn-sm" onclick="addAsset()">+ Asset</button>`;
+  const totVal=P.reduce((s,p)=>s+p.qty*p.currentPrice,0);
+  const totCost=P.reduce((s,p)=>s+p.qty*p.buyPrice,0);
+  const totPnL=totVal-totCost;
+  const totPct=totCost>0?totPnL/totCost*100:0;
+  const crypto=P.filter(p=>p.type==='crypto'), stocks=P.filter(p=>p.type==='stock');
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="g4">
+      <div class="mc gold"><div class="ml">Valore totale</div><div class="mv au">${fmt(totVal)}</div><div class="ms">Costo: ${fmt(totCost)}</div></div>
+      <div class="mc"><div class="ml">P/L totale</div><div class="mv ${totPnL>=0?'g':'r'}">${totPnL>=0?'+':''}${fmt(totPnL)}</div><div class="ms"><span class="${totPct>=0?'p':'n'}">${fmtP(totPct)}</span></div></div>
+      <div class="mc"><div class="ml">Crypto</div><div class="mv">${fmt(crypto.reduce((s,p)=>s+p.qty*p.currentPrice,0))}</div><div class="ms">${crypto.length} asset</div></div>
+      <div class="mc"><div class="ml">Azioni</div><div class="mv">${fmt(stocks.reduce((s,p)=>s+p.qty*p.currentPrice,0))}</div><div class="ms">${stocks.length} titoli</div></div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Allocazione</div></div>
+        <div class="cw" style="height:210px"><canvas id="por-c"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Performance per asset</div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${P.map(p=>{
+            const v=p.qty*p.currentPrice,c=p.qty*p.buyPrice,pnl=v-c,pct=c>0?pnl/c*100:0,alloc=totVal>0?v/totVal*100:0;
+            return`<div style="padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <div style="display:flex;align-items:center;gap:7px">
+                  <span class="badge ${p.type==='crypto'?'bau':'bb'}">${p.type==='crypto'?'CRYPTO':'AZIONE'}</span>
+                  <span style="font-weight:500;font-size:13px">${p.name}</span>
+                  <span style="font-size:11px;color:var(--t3)">${p.ticker}</span>
+                </div>
+                <span class="mono" style="color:${pnl>=0?'var(--green)':'var(--red)'};font-size:12.5px;font-weight:500">${pnl>=0?'+':''}${fmt(pnl)} (${fmtP(pct)})</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--t3);margin-bottom:4px">
+                <span>${fmtN(p.qty,4)} × ${fmt(p.currentPrice,2)}</span>
+                <span>${fmt(v,0)} · ${alloc.toFixed(1)}%</span>
+              </div>
+              <div class="pw" style="height:3px"><div class="pb" style="width:${alloc}%;background:${pnl>=0?'var(--green)':'var(--red)'}"></div></div>
+            </div>`;
+          }).join('')||'<div class="empty"><div class="empty-s">Nessun asset</div></div>'}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Posizioni</div><button class="btn btn-gold btn-sm" onclick="addAsset()">+ Aggiungi</button></div>
+      <div class="tw"><table>
+        <thead><tr><th>Asset</th><th>Tipo</th><th>Qtà</th><th>P. acquisto</th><th>P. corrente</th><th>Valore</th><th>P/L</th><th>%</th><th></th></tr></thead>
+        <tbody>${P.map(p=>{
+          const v=p.qty*p.currentPrice,c=p.qty*p.buyPrice,pnl=v-c,pct=c>0?pnl/c*100:0;
+          return`<tr>
+            <td><strong>${p.ticker}</strong><div style="font-size:11px;color:var(--t3)">${p.name}</div></td>
+            <td><span class="badge ${p.type==='crypto'?'bau':'bb'}">${p.type==='crypto'?'Crypto':'Azione'}</span></td>
+            <td class="tm">${fmtN(p.qty,4)}</td>
+            <td class="tm">${fmt(p.buyPrice,2)}</td>
+            <td class="tm">${fmt(p.currentPrice,2)}</td>
+            <td class="tm">${fmt(v)}</td>
+            <td class="tm" style="color:${pnl>=0?'var(--green)':'var(--red)'}">${pnl>=0?'+':''}${fmt(pnl)}</td>
+            <td class="tm" style="color:${pct>=0?'var(--green)':'var(--red)'}">${fmtP(pct)}</td>
+            <td style="white-space:nowrap">
+              <button onclick="editAsset('${p.id}')" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--t2);cursor:pointer;padding:3px 7px;font-size:11px;margin-right:4px">Edit</button>
+              <button onclick="delAsset('${p.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px">×</button>
+            </td>
+          </tr>`;
+        }).join('')||'<tr><td colspan="9"><div class="empty"><div class="empty-s">Nessuna posizione</div></div></td></tr>'}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+
+  if(P.length) mkChart('por-c',{type:'doughnut',data:{labels:P.map(p=>p.ticker),datasets:[{data:P.map(p=>p.qty*p.currentPrice),backgroundColor:['#c9a84c','#5b8dee','#4caf7d','#e05c5c','#9b59b6','#e8a44a','#1abc9c'],borderColor:'#111',borderWidth:3,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{color:'#9b968f',font:{size:11},padding:10,usePointStyle:true}},tooltip:{...TT,callbacks:{label:c=>`${c.label}: ${fmt(c.parsed)}`}}}}});
+};
+
+function addAsset(){
+  openModal(`<div class="modal"><div class="modal-title">Aggiungi asset</div>
+    <div class="fg" style="gap:13px">
+      <div class="fg fg2">
+        <div><label class="fl">Nome</label><input type="text" id="an" class="fi" placeholder="es. Bitcoin"></div>
+        <div><label class="fl">Ticker</label><input type="text" id="at" class="fi" placeholder="es. BTC"></div>
+      </div>
+      <div><label class="fl">Tipo</label><select id="aty" class="fi"><option value="crypto">Crypto</option><option value="stock">Azione</option></select></div>
+      <div class="fg fg3">
+        <div><label class="fl">Quantità</label><input type="number" id="aq" class="fi" placeholder="0.00" step="0.0001"></div>
+        <div><label class="fl">P. acquisto ($)</label><input type="number" id="ab" class="fi" placeholder="0.00" step="0.01"></div>
+        <div><label class="fl">P. attuale ($)</label><input type="number" id="ac" class="fi" placeholder="0.00" step="0.01"></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveAsset()">Salva</button></div>
+  </div>`);
+}
+function saveAsset(){
+  const n=document.getElementById('an').value,t=document.getElementById('at').value.toUpperCase(),ty=document.getElementById('aty').value;
+  const q=parseFloat(document.getElementById('aq').value)||0,b=parseFloat(document.getElementById('ab').value)||0,c=parseFloat(document.getElementById('ac').value)||0;
+  if(!n||!t||!q) return;
+  DB.push('portfolio',{id:uid(),name:n,ticker:t,type:ty,qty:q,buyPrice:b,currentPrice:c});
+  closeModal(); nav('portfolio');
+}
+function editAsset(id){
+  const p=(DB.get('portfolio')||[]).find(x=>x.id===id); if(!p) return;
+  openModal(`<div class="modal"><div class="modal-title">Modifica ${p.ticker}</div>
+    <div class="fg">
+      <div><label class="fl">Prezzo corrente ($)</label><input type="number" id="ep" class="fi" value="${p.currentPrice}" step="0.01"></div>
+      <div><label class="fl">Quantità</label><input type="number" id="eq" class="fi" value="${p.qty}" step="0.0001"></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveEdit('${id}')">Salva</button></div>
+  </div>`);
+}
+function saveEdit(id){
+  const P=DB.get('portfolio')||[], i=P.findIndex(p=>p.id===id); if(i<0)return;
+  P[i].currentPrice=parseFloat(document.getElementById('ep').value)||P[i].currentPrice;
+  P[i].qty=parseFloat(document.getElementById('eq').value)||P[i].qty;
+  DB.set('portfolio',P); closeModal(); nav('portfolio');
+}
+function delAsset(id){ if(confirm('Eliminare?')){ DB.del('portfolio',id); nav('portfolio'); } }
+
+/* ────────────────────────────────────────────────────────
+   PAGE: ACCUMULO
+──────────────────────────────────────────────────────── */
+PAGES.accumulo=function(){
+  const acc=DB.get('accumulo')||[];
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-gold btn-sm" onclick="addAcc()">+ Versamento</button>`;
+  const total=acc.reduce((s,a)=>s+a.amount,0);
+  const sorted=[...acc].sort((a,b)=>a.date.localeCompare(b.date));
+  const months=acc.length?new Set(acc.map(a=>a.date.slice(0,7))).size:1;
+  const avgM=total/months;
+  const assets=[...new Set(acc.map(a=>a.asset))];
+  const byA=assets.map(asset=>{const items=acc.filter(a=>a.asset===asset);return{asset,total:items.reduce((s,a)=>s+a.amount,0),n:items.length};});
+
+  let run=0;
+  const cD=sorted.map(a=>{run+=a.amount;return{d:a.date.slice(5),v:Math.round(run)};});
+
+  const pac=[300,400,500].map(m=>({m,p:[1,3,5,10].map(y=>Math.round(m*12*y*(1+0.07*y/2)))}));
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="g4">
+      <div class="mc gold"><div class="ml">Totale accumulato</div><div class="mv au">${fmt(total)}</div><div class="ms">${acc.length} versamenti</div></div>
+      <div class="mc"><div class="ml">Media mensile</div><div class="mv">${fmt(avgM)}</div></div>
+      <div class="mc"><div class="ml">Asset</div><div class="mv">${assets.length}</div></div>
+      <div class="mc"><div class="ml">Proiezione 5 anni*</div><div class="mv g">${fmt(total+avgM*12*5*1.07)}</div><div class="ms">*7% rendimento</div></div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Curva di accumulo</div></div>
+        <div class="cw" style="height:210px"><canvas id="acc-c"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Per asset</div></div>
+        ${byA.length?byA.map(a=>{const pct=total>0?Math.round(a.total/total*100):0;return`<div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span style="font-weight:500">${a.asset}</span>
+            <span class="mono">${fmt(a.total)} <span style="color:var(--t3)">(${pct}%)</span></span>
+          </div>
+          <div class="pw"><div class="pb pb-au" style="width:${pct}%"></div></div>
+        </div>`;}).join(''):`<div class="empty"><div class="empty-s">Nessun dato</div></div>`}
+      </div>
+    </div>
+
+    <div class="card g1">
+      <div class="card-hd"><div class="card-title">Simulatore PAC</div></div>
+      <div class="tw"><table>
+        <thead><tr><th>Mensile</th><th>1 anno</th><th>3 anni</th><th>5 anni</th><th>10 anni</th></tr></thead>
+        <tbody>${pac.map(r=>`<tr>
+          <td class="tm" style="color:var(--gold2);font-weight:500">${fmt(r.m)}/mese</td>
+          ${r.p.map(v=>`<td class="tm" style="color:var(--green)">${fmt(v)}</td>`).join('')}
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <div style="font-size:11px;color:var(--t3);margin-top:8px">*Rendimento 7% annuo composto — non è una garanzia.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Storico versamenti</div><button class="btn btn-gold btn-sm" onclick="addAcc()">+ Aggiungi</button></div>
+      <div class="tw"><table>
+        <thead><tr><th>Data</th><th>Asset</th><th>Importo</th><th>Note</th><th></th></tr></thead>
+        <tbody>${[...acc].sort((a,b)=>b.date.localeCompare(a.date)).map(a=>`<tr>
+          <td style="color:var(--t3)">${a.date}</td>
+          <td>${a.asset}</td>
+          <td class="tm" style="color:var(--green)">+${fmt(a.amount)}</td>
+          <td style="font-size:12px;color:var(--t3)">${a.note||'—'}</td>
+          <td><button onclick="delAcc('${a.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px">×</button></td>
+        </tr>`).join('')||'<tr><td colspan="5"><div class="empty"><div class="empty-s">Nessun versamento</div></div></td></tr>'}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+
+  if(cD.length) mkChart('acc-c',{type:'line',data:{labels:cD.map(d=>d.d),datasets:[{label:'Accumulato',data:cD.map(d=>d.v),borderColor:'#c9a84c',borderWidth:2,pointRadius:cD.length>20?0:3,tension:.4,fill:true,backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,210);g.addColorStop(0,'rgba(201,168,76,.22)');g.addColorStop(1,'rgba(201,168,76,0)');return g;}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>'€ '+c.parsed.y.toLocaleString('it-IT')}}},scales:{x:{ticks:TX,grid:{color:GR}},y:{ticks:{...TX,callback:v=>'€'+(v/1000).toFixed(1)+'k'},grid:{color:GR}}}}});
+};
+
+function addAcc(){
+  openModal(`<div class="modal"><div class="modal-title">Nuovo versamento</div>
+    <div class="fg" style="gap:13px">
+      <div class="fg fg2">
+        <div><label class="fl">Data</label><input type="date" id="ad" class="fi" value="${today()}"></div>
+        <div><label class="fl">Importo (€)</label><input type="number" id="aa" class="fi" placeholder="300" step="0.01"></div>
+      </div>
+      <div><label class="fl">Asset / Strumento</label><input type="text" id="aas" class="fi" placeholder="es. ETF S&P500, BTC, Gold ETC"></div>
+      <div><label class="fl">Note</label><input type="text" id="an" class="fi" placeholder="es. PAC mensile"></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveAcc()">Salva</button></div>
+  </div>`);
+}
+function saveAcc(){
+  const d=document.getElementById('ad').value,a=parseFloat(document.getElementById('aa').value),as=document.getElementById('aas').value,n=document.getElementById('an').value;
+  if(!d||!a||!as)return;
+  DB.push('accumulo',{id:uid(),date:d,amount:a,asset:as,note:n});
+  closeModal(); nav('accumulo');
+}
+function delAcc(id){ DB.del('accumulo',id); nav('accumulo'); }
+
+/* ────────────────────────────────────────────────────────
+   BOOT
+──────────────────────────────────────────────────────── */
+
+/* ────────────────────────────────────────────────────────
+   PAGE: PRESTITI
+──────────────────────────────────────────────────────── */
+PAGES.prestiti=function(){
+  const loans=DB.get('loans')||[];
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-gold btn-sm" onclick="addLoan()">+ Prestito</button>`;
+
+  const totalDebt=loans.reduce((s,l)=>s+l.remaining,0);
+  const totalMonthly=loans.reduce((s,l)=>s+l.monthlyPayment,0);
+  const totalInterest=loans.reduce((s,l)=>s+(l.monthlyPayment*l.remainingMonths-l.remaining),0);
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="g3">
+      <div class="mc gold"><div class="ml">Debito totale</div><div class="mv au">${fmt(totalDebt)}</div></div>
+      <div class="mc"><div class="ml">Rata mensile totale</div><div class="mv r">${fmt(totalMonthly)}</div></div>
+      <div class="mc"><div class="ml">Interessi totali</div><div class="mv">${fmt(Math.max(0,totalInterest))}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">I tuoi prestiti</div><button class="btn btn-gold btn-sm" onclick="addLoan()">+ Aggiungi</button></div>
+      ${loans.length===0?`<div class="empty"><div class="empty-icon">◎</div><div class="empty-t">Nessun prestito</div><div class="empty-s">Aggiungi mutui, prestiti personali o finanziamenti</div></div>`:`
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${loans.map(l=>{
+          const paid=l.totalAmount-l.remaining;
+          const pct=Math.round(paid/l.totalAmount*100);
+          const endDate=new Date();endDate.setMonth(endDate.getMonth()+l.remainingMonths);
+          return`<div style="padding:14px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div>
+                <div style="font-weight:500;font-size:14px">${l.name}</div>
+                <div style="font-size:11px;color:var(--t3);margin-top:2px">${l.type} · ${l.rate}% TAN · fine ${endDate.toLocaleDateString('it-IT',{month:'short',year:'numeric'})}</div>
+              </div>
+              <div style="text-align:right">
+                <div class="mono" style="font-size:15px;font-weight:500;color:var(--red)">${fmt(l.remaining)}</div>
+                <div style="font-size:11px;color:var(--t3)">rata ${fmt(l.monthlyPayment)}/mese</div>
+              </div>
+            </div>
+            <div class="pw h8" style="margin-bottom:6px"><div class="pb pb-au" style="width:${pct}%"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3)">
+              <span>Pagato: ${fmt(paid)} (${pct}%)</span>
+              <span>Rimangono ${l.remainingMonths} rate</span>
+              <button onclick="delLoan('${l.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:12px">Elimina</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>
+  </div>`;
+};
+
+function addLoan(){
+  openModal(`<div class="modal"><div class="modal-title">Nuovo prestito</div>
+    <div class="fg" style="gap:13px">
+      <div class="fg fg2">
+        <div><label class="fl">Nome</label><input type="text" id="ln" class="fi" placeholder="es. Mutuo casa"></div>
+        <div><label class="fl">Tipo</label><select id="lt" class="fi"><option>Mutuo</option><option>Prestito personale</option><option>Finanziamento auto</option><option>Cessione quinto</option><option>Altro</option></select></div>
+      </div>
+      <div class="fg fg3">
+        <div><label class="fl">Importo totale (€)</label><input type="number" id="la" class="fi" placeholder="es. 150000"></div>
+        <div><label class="fl">Debito residuo (€)</label><input type="number" id="lr" class="fi" placeholder="es. 120000"></div>
+        <div><label class="fl">Rata mensile (€)</label><input type="number" id="lm" class="fi" placeholder="es. 800"></div>
+      </div>
+      <div class="fg fg2">
+        <div><label class="fl">Tasso annuo % (TAN)</label><input type="number" id="lrate" class="fi" placeholder="es. 3.5" step="0.1"></div>
+        <div><label class="fl">Rate rimanenti</label><input type="number" id="lmon" class="fi" placeholder="es. 180"></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveLoan()">Salva</button></div>
+  </div>`);
+}
+function saveLoan(){
+  const name=document.getElementById('ln').value,type=document.getElementById('lt').value;
+  const totalAmount=parseFloat(document.getElementById('la').value)||0;
+  const remaining=parseFloat(document.getElementById('lr').value)||0;
+  const monthlyPayment=parseFloat(document.getElementById('lm').value)||0;
+  const rate=parseFloat(document.getElementById('lrate').value)||0;
+  const remainingMonths=parseInt(document.getElementById('lmon').value)||0;
+  if(!name||!totalAmount)return;
+  DB.push('loans',{id:uid(),name,type,totalAmount,remaining,monthlyPayment,rate,remainingMonths});
+  closeModal();nav('prestiti');
+}
+function delLoan(id){if(confirm('Eliminare?')){DB.del('loans',id);nav('prestiti');}}
+
+/* ────────────────────────────────────────────────────────
+   PAGE: CALCOLATRICE
+──────────────────────────────────────────────────────── */
+PAGES.calcolatrice=function(){
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="g2">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Interesse composto</div></div>
+        <div class="fg" style="gap:13px;margin-bottom:16px">
+          <div class="fg fg2">
+            <div><label class="fl">Capitale iniziale (€)</label><input type="number" id="ci" class="fi" value="10000" oninput="calcComp()"></div>
+            <div><label class="fl">Versamento mensile (€)</label><input type="number" id="vm" class="fi" value="300" oninput="calcComp()"></div>
+          </div>
+          <div class="fg fg3">
+            <div><label class="fl">Rendimento annuo %</label><input type="number" id="ra" class="fi" value="7" step="0.5" oninput="calcComp()"></div>
+            <div><label class="fl">Anni</label><input type="number" id="an" class="fi" value="10" oninput="calcComp()"></div>
+            <div><label class="fl">Frequenza</label><select id="fr" class="fi" onchange="calcComp()"><option value="12">Mensile</option><option value="4">Trimestrale</option><option value="1">Annuale</option></select></div>
+          </div>
+        </div>
+        <div id="comp-result" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px"></div>
+        <div class="cw" style="height:220px"><canvas id="comp-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">Convertitore valute</div></div>
+        <div class="fg" style="gap:13px">
+          <div class="fg fg2">
+            <div><label class="fl">Importo</label><input type="number" id="cv-amount" class="fi" value="1000" oninput="calcCurrency()"></div>
+            <div><label class="fl">Da</label><select id="cv-from" class="fi" onchange="calcCurrency()">
+              <option value="EUR">EUR €</option><option value="USD">USD $</option><option value="GBP">GBP £</option><option value="CHF">CHF</option><option value="JPY">JPY ¥</option><option value="BTC">BTC ₿</option>
+            </select></div>
+          </div>
+          <div><label class="fl">A</label><select id="cv-to" class="fi" onchange="calcCurrency()">
+            <option value="USD">USD $</option><option value="EUR">EUR €</option><option value="GBP">GBP £</option><option value="CHF">CHF</option><option value="JPY">JPY ¥</option><option value="BTC">BTC ₿</option>
+          </select></div>
+          <div id="cv-result" style="padding:16px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;text-align:center">
+            <div style="font-size:11px;color:var(--t3);margin-bottom:6px">Risultato (tassi indicativi)</div>
+            <div class="mono" style="font-size:28px;font-weight:500;color:var(--gold2)" id="cv-val">—</div>
+          </div>
+          <div style="font-size:11px;color:var(--t3)">* Tassi approssimativi. Per tassi in tempo reale usa un servizio dedicato.</div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--b1);margin:20px 0">
+
+        <div class="card-hd" style="margin-bottom:12px"><div class="card-title">Rendimento netto (tasse)</div></div>
+        <div class="fg" style="gap:13px">
+          <div class="fg fg2">
+            <div><label class="fl">Guadagno lordo (€)</label><input type="number" id="tax-gross" class="fi" placeholder="es. 5000" oninput="calcTax()"></div>
+            <div><label class="fl">Aliquota %</label><select id="tax-rate" class="fi" onchange="calcTax()">
+              <option value="26">26% (capital gain IT)</option>
+              <option value="23">23% (IRPEF 1° scaglione)</option>
+              <option value="25">25% (Flat tax P.IVA)</option>
+              <option value="43">43% (IRPEF max)</option>
+            </select></div>
+          </div>
+          <div id="tax-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  calcComp();calcCurrency();
+};
+
+function calcComp(){
+  const C=parseFloat(document.getElementById('ci')?.value)||0;
+  const M=parseFloat(document.getElementById('vm')?.value)||0;
+  const r=parseFloat(document.getElementById('ra')?.value)||0;
+  const Y=parseFloat(document.getElementById('an')?.value)||0;
+  const f=parseInt(document.getElementById('fr')?.value)||12;
+  const rate=r/100/f;
+  const n=Y*f;
+  const fv=C*Math.pow(1+rate,n)+M*(Math.pow(1+rate,n)-1)/rate;
+  const invested=C+M*n;
+  const interest=fv-invested;
+  const el=document.getElementById('comp-result');
+  if(!el)return;
+  el.innerHTML=[
+    {l:'Capitale finale',v:fmt(fv),c:'var(--gold2)'},
+    {l:'Versato totale',v:fmt(invested),c:'var(--t1)'},
+    {l:'Interessi maturati',v:fmt(interest),c:'var(--green)'},
+  ].map(({l,v,c})=>`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px">
+    <div style="font-size:11px;color:var(--t3);margin-bottom:4px">${l}</div>
+    <div class="mono" style="font-size:15px;font-weight:500;color:${c}">${v}</div>
+  </div>`).join('');
+  // Chart
+  const labels=[],capData=[],totData=[];
+  for(let y=0;y<=Y;y++){
+    const ni=y*f;
+    const fvi=C*Math.pow(1+rate,ni)+M*(Math.pow(1+rate,ni)-1)/rate;
+    labels.push('Anno '+y);
+    capData.push(Math.round(C+M*ni));
+    totData.push(Math.round(fvi));
+  }
+  mkChart('comp-chart',{type:'line',data:{labels,datasets:[
+    {label:'Capitale investito',data:capData,borderColor:'#5b8dee',borderWidth:1.5,pointRadius:0,fill:true,backgroundColor:'rgba(91,141,238,.1)'},
+    {label:'Valore finale',data:totData,borderColor:'#c9a84c',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(201,168,76,.12)'},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#9b968f',font:{size:11},padding:10,usePointStyle:true}},tooltip:{backgroundColor:'#181818',borderColor:'#2a2a2a',borderWidth:1,callbacks:{label:c=>'€ '+Math.round(c.parsed.y).toLocaleString('it-IT')}}},scales:{x:{ticks:{font:{size:10},color:'#575350'},grid:{color:'rgba(42,42,42,.5)'}},y:{ticks:{font:{size:10},color:'#575350',callback:v=>'€'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(42,42,42,.5)'}}}}}); 
+}
+
+const FX={EUR:1,USD:1.08,GBP:0.86,CHF:0.97,JPY:163.5,BTC:0.0000155};
+function calcCurrency(){
+  const a=parseFloat(document.getElementById('cv-amount')?.value)||0;
+  const from=document.getElementById('cv-from')?.value||'EUR';
+  const to=document.getElementById('cv-to')?.value||'USD';
+  const result=a/FX[from]*FX[to];
+  const el=document.getElementById('cv-val');
+  if(el)el.textContent=to==='BTC'?result.toFixed(8):result.toLocaleString('it-IT',{maximumFractionDigits:2})+' '+to;
+}
+
+function calcTax(){
+  const gross=parseFloat(document.getElementById('tax-gross')?.value)||0;
+  const rate=parseFloat(document.getElementById('tax-rate')?.value)||26;
+  const tax=gross*rate/100;
+  const net=gross-tax;
+  const el=document.getElementById('tax-result');
+  if(!el||!gross)return;
+  el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    ${[{l:'Lordo',v:fmt(gross),c:'var(--t1)'},{l:'Tasse ('+rate+'%)',v:fmt(tax),c:'var(--red)'},{l:'Netto',v:fmt(net),c:'var(--green)'}]
+    .map(({l,v,c})=>`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px">
+      <div style="font-size:11px;color:var(--t3);margin-bottom:3px">${l}</div>
+      <div class="mono" style="font-size:14px;font-weight:500;color:${c}">${v}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+/* ────────────────────────────────────────────────────────
+   PAGE: DIARIO
+──────────────────────────────────────────────────────── */
+PAGES.diario=function(){
+  const entries=DB.get('diary')||[];
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-gold btn-sm" onclick="addDiary()">+ Nuova nota</button>`;
+  const sorted=[...entries].sort((a,b)=>b.date.localeCompare(a.date));
+  const moods=['😤','😟','😐','🙂','😄'];
+  const moodLabels=['Pessimo','Negativo','Neutro','Positivo','Ottimo'];
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-hd"><div class="card-title">Diario finanziario & psicologia del trading</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${moods.map((m,i)=>{
+          const cnt=entries.filter(e=>e.mood===i).length;
+          return`<div style="flex:1;min-width:80px;padding:10px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;text-align:center">
+            <div style="font-size:22px">${m}</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:3px">${moodLabels[i]}</div>
+            <div class="mono" style="font-size:14px;font-weight:500;margin-top:2px">${cnt}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-title">Note (${entries.length})</div>
+        <button class="btn btn-gold btn-sm" onclick="addDiary()">+ Scrivi</button>
+      </div>
+      ${sorted.length===0?`<div class="empty"><div class="empty-icon">✍</div><div class="empty-t">Nessuna nota</div><div class="empty-s">Tieni traccia del tuo stato mentale e delle decisioni di trading</div></div>`:`
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${sorted.map(e=>`<div style="padding:14px 16px;background:var(--s2);border:1px solid var(--b1);border-radius:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:20px">${moods[e.mood]||'😐'}</span>
+              <span style="font-size:11px;color:var(--t3)">${e.date}</span>
+              ${e.tags?e.tags.map(t=>`<span class="badge bgr" style="font-size:10px">${t}</span>`).join(''):''}
+            </div>
+            <button onclick="delDiary('${e.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px">×</button>
+          </div>
+          <div style="font-size:13px;color:var(--t1);line-height:1.6">${e.text}</div>
+          ${e.lessons?`<div style="margin-top:8px;padding:8px 10px;background:var(--gd);border-radius:6px;font-size:12px;color:var(--gold2)">💡 ${e.lessons}</div>`:''}
+        </div>`).join('')}
+      </div>`}
+    </div>
+  </div>`;
+};
+
+function addDiary(){
+  const moods=['😤','😟','😐','🙂','😄'];
+  openModal(`<div class="modal"><div class="modal-title">✍ Nuova nota</div>
+    <div class="fg" style="gap:13px">
+      <div><label class="fl">Data</label><input type="date" id="dd" class="fi" value="${today()}"></div>
+      <div>
+        <label class="fl">Umore</label>
+        <div style="display:flex;gap:8px;margin-top:4px" id="mood-sel">
+          ${moods.map((m,i)=>`<div onclick="selMood(${i})" id="mood-${i}" style="flex:1;padding:8px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;text-align:center;cursor:pointer;font-size:20px;transition:all .15s">${m}</div>`).join('')}
+        </div>
+        <input type="hidden" id="mood-val" value="2">
+      </div>
+      <div><label class="fl">Nota / riflessione</label><textarea id="dt" class="fi" rows="4" placeholder="Come è andata oggi? Cosa hai imparato? Come ti senti riguardo alle tue decisioni?"></textarea></div>
+      <div><label class="fl">Lezione appresa (opz.)</label><input type="text" id="dl" class="fi" placeholder="es. Non tradare dopo 2 loss consecutivi"></div>
+      <div><label class="fl">Tag (opz., separati da virgola)</label><input type="text" id="dtag" class="fi" placeholder="es. trading, emozioni, disciplina"></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveDiary()">Salva</button></div>
+  </div>`);
+  selMood(2);
+}
+function selMood(i){
+  document.getElementById('mood-val').value=i;
+  for(let j=0;j<5;j++){
+    const el=document.getElementById('mood-'+j);
+    el.style.borderColor=j===i?'var(--gold)':'var(--b1)';
+    el.style.background=j===i?'var(--gd)':'var(--s2)';
+  }
+}
+function saveDiary(){
+  const date=document.getElementById('dd').value,text=document.getElementById('dt').value;
+  if(!date||!text)return;
+  const mood=parseInt(document.getElementById('mood-val').value)||2;
+  const lessons=document.getElementById('dl').value;
+  const tagStr=document.getElementById('dtag').value;
+  const tags=tagStr?tagStr.split(',').map(t=>t.trim()).filter(Boolean):[];
+  DB.push('diary',{id:uid(),date,text,mood,lessons,tags});
+  closeModal();nav('diario');
+}
+function delDiary(id){DB.del('diary',id);nav('diario');}
+
+/* ────────────────────────────────────────────────────────
+   PAGE: OBIETTIVI
+──────────────────────────────────────────────────────── */
+PAGES.obiettivi=function(){
+  const goals=DB.get('goals')||[];
+  document.getElementById('topbar-actions').innerHTML=`<button class="btn btn-gold btn-sm" onclick="addGoal()">+ Obiettivo</button>`;
+
+  const active=goals.filter(g=>!g.completed);
+  const done=goals.filter(g=>g.completed);
+
+  document.getElementById('content').innerHTML=`<div class="page">
+    <div class="g3" style="margin-bottom:16px">
+      <div class="mc gold"><div class="ml">Obiettivi attivi</div><div class="mv au">${active.length}</div></div>
+      <div class="mc"><div class="ml">Completati</div><div class="mv g">${done.length}</div></div>
+      <div class="mc"><div class="ml">Totale</div><div class="mv">${goals.length}</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title">Obiettivi finanziari</div><button class="btn btn-gold btn-sm" onclick="addGoal()">+ Aggiungi</button></div>
+      ${goals.length===0?`<div class="empty"><div class="empty-icon">🎯</div><div class="empty-t">Nessun obiettivo</div><div class="empty-s">Definisci i tuoi traguardi finanziari</div></div>`:`
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${goals.map(g=>{
+          const pct=g.target>0?Math.min(100,Math.round(g.current/g.target*100)):0;
+          const daysLeft=g.deadline?Math.round((new Date(g.deadline)-new Date())/86400000):null;
+          return`<div style="padding:14px 16px;background:var(--s2);border:1px solid ${g.completed?'rgba(76,175,125,.3)':'var(--b1)'};border-radius:10px;${g.completed?'opacity:.7':''}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+              <div>
+                <div style="font-weight:500;font-size:14px;display:flex;align-items:center;gap:7px">
+                  ${g.completed?'<span style="color:var(--green)">✓</span>':''}${g.name}
+                  <span class="badge ${g.category==='trading'?'bau':g.category==='risparmio'?'bg':'bb'}" style="font-size:10px">${g.category}</span>
+                </div>
+                ${g.deadline?`<div style="font-size:11px;color:${daysLeft<30?'var(--red)':'var(--t3)'};margin-top:2px">${daysLeft>=0?daysLeft+' giorni rimanenti':'Scaduto'}</div>`:''}
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="mono" style="font-size:13px;color:var(--gold2)">${fmt(g.current)} / ${fmt(g.target)}</span>
+                <button onclick="updateGoal('${g.id}')" style="background:none;border:1px solid var(--b2);border-radius:5px;color:var(--t2);cursor:pointer;padding:3px 7px;font-size:11px">Edit</button>
+                <button onclick="delGoal('${g.id}')" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px">×</button>
+              </div>
+            </div>
+            <div class="pw h8" style="margin-bottom:5px"><div class="pb ${pct>=100?'pb-g':'pb-au'}" style="width:${pct}%"></div></div>
+            <div style="font-size:11px;color:var(--t3)">${pct}% completato${g.notes?` · ${g.notes}`:''}</div>
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>
+  </div>`;
+};
+
+function addGoal(){
+  openModal(`<div class="modal"><div class="modal-title">🎯 Nuovo obiettivo</div>
+    <div class="fg" style="gap:13px">
+      <div><label class="fl">Nome obiettivo</label><input type="text" id="gn" class="fi" placeholder="es. Conto trading a 35.000€"></div>
+      <div class="fg fg2">
+        <div><label class="fl">Target (€)</label><input type="number" id="gt" class="fi" placeholder="35000"></div>
+        <div><label class="fl">Progresso attuale (€)</label><input type="number" id="gc" class="fi" placeholder="0"></div>
+      </div>
+      <div class="fg fg2">
+        <div><label class="fl">Categoria</label><select id="gcat" class="fi"><option value="trading">Trading</option><option value="risparmio">Risparmio</option><option value="investimento">Investimento</option><option value="altro">Altro</option></select></div>
+        <div><label class="fl">Scadenza (opz.)</label><input type="date" id="gd" class="fi"></div>
+      </div>
+      <div><label class="fl">Note</label><input type="text" id="gnotes" class="fi" placeholder="es. Raggiungere entro fine anno"></div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveGoal()">Salva</button></div>
+  </div>`);
+}
+function saveGoal(){
+  const name=document.getElementById('gn').value;
+  if(!name)return;
+  DB.push('goals',{id:uid(),name,target:parseFloat(document.getElementById('gt').value)||0,current:parseFloat(document.getElementById('gc').value)||0,category:document.getElementById('gcat').value,deadline:document.getElementById('gd').value,notes:document.getElementById('gnotes').value,completed:false});
+  closeModal();nav('obiettivi');
+}
+function updateGoal(id){
+  const g=(DB.get('goals')||[]).find(x=>x.id===id);if(!g)return;
+  openModal(`<div class="modal"><div class="modal-title">Aggiorna obiettivo</div>
+    <div class="fg" style="gap:13px">
+      <div><label class="fl">Progresso attuale (€)</label><input type="number" id="gup" class="fi" value="${g.current}"></div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--s2);border-radius:8px;cursor:pointer" onclick="toggleGoalComplete('${id}')">
+        <div style="width:18px;height:18px;border-radius:4px;border:1.5px solid var(--b2);background:${g.completed?'var(--green)':'var(--s3)'};display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">${g.completed?'✓':''}</div>
+        <span style="font-size:13px">Segna come completato</span>
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-ghost" onclick="closeModal()">Annulla</button><button class="btn btn-gold" onclick="saveGoalUpdate('${id}')">Salva</button></div>
+  </div>`);
+}
+function saveGoalUpdate(id){
+  const goals=DB.get('goals')||[];const i=goals.findIndex(g=>g.id===id);if(i<0)return;
+  goals[i].current=parseFloat(document.getElementById('gup').value)||0;
+  goals[i].completed=goals[i].current>=goals[i].target;
+  DB.set('goals',goals);closeModal();nav('obiettivi');
+}
+function delGoal(id){DB.del('goals',id);nav('obiettivi');}
+
+/* ────────────────────────────────────────────────────────
+   UPDATED NAV + PAGE_META + ROUTER
+──────────────────────────────────────────────────────── */
+// Override nav links e bottom nav con sezioni aggiuntive
+document.getElementById('nav-links').innerHTML=`
+  <div class="nav-link active" data-page="dashboard" onclick="nav('dashboard')"><span class="nl-icon">◈</span><span class="nl-txt">Dashboard</span></div>
+  <div class="nav-link" data-page="budget" onclick="nav('budget')"><span class="nl-icon">◉</span><span class="nl-txt">Budget</span></div>
+  <div class="nav-sep"></div><div class="nav-group-lbl">Trading</div>
+  <div class="nav-link" data-page="journal" onclick="nav('journal')"><span class="nl-icon">◆</span><span class="nl-txt">Journal</span></div>
+  <div class="nav-link" data-page="stats" onclick="nav('stats')"><span class="nl-icon">◇</span><span class="nl-txt">Stats</span></div>
+  <div class="nav-link" data-page="scalata" onclick="nav('scalata')"><span class="nl-icon">▲</span><span class="nl-txt">Scalata</span></div>
+  <div class="nav-link" data-page="obiettivi" onclick="nav('obiettivi')"><span class="nl-icon">🎯</span><span class="nl-txt">Obiettivi</span></div>
+  <div class="nav-sep"></div><div class="nav-group-lbl">Portfolio</div>
+  <div class="nav-link" data-page="portfolio" onclick="nav('portfolio')"><span class="nl-icon">◑</span><span class="nl-txt">Crypto/Azioni</span></div>
+  <div class="nav-link" data-page="accumulo" onclick="nav('accumulo')"><span class="nl-icon">◐</span><span class="nl-txt">Accumulo</span></div>
+  <div class="nav-sep"></div><div class="nav-group-lbl">Strumenti</div>
+  <div class="nav-link" data-page="prestiti" onclick="nav('prestiti')"><span class="nl-icon">◎</span><span class="nl-txt">Prestiti</span></div>
+  <div class="nav-link" data-page="calcolatrice" onclick="nav('calcolatrice')"><span class="nl-icon">◧</span><span class="nl-txt">Calcolatrice</span></div>
+  <div class="nav-link" data-page="diario" onclick="nav('diario')"><span class="nl-icon">✍</span><span class="nl-txt">Diario</span></div>
+`;
+
+const PAGE_META_EXT={
+  prestiti:{title:'Prestiti & Mutui',sub:'Gestione debiti e finanziamenti'},
+  calcolatrice:{title:'Calcolatrice',sub:'Interesse composto, valute e tasse'},
+  diario:{title:'Diario finanziario',sub:'Note, riflessioni e psicologia del trading'},
+  obiettivi:{title:'Obiettivi',sub:'Traguardi finanziari e progress tracking'},
+};
+const _origNav=nav;
+nav=function(page){
+  const meta=PAGE_META_EXT[page];
+  if(meta){
+    currentPage=page;
+    document.querySelectorAll('.nav-link').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
+    document.querySelectorAll('.bn-item').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
+    document.getElementById('nav-page-title').textContent=meta.title;
+    document.getElementById('topbar-actions').innerHTML='';
+    document.getElementById('content').innerHTML='';
+    PAGES[page]();
+  } else {
+    _origNav(page);
+  }
+};
+
+// Seed goals e prestiti di esempio
+if(!DB.get('goals_seeded')){
+  DB.set('goals_seeded',true);
+  DB.set('goals',[
+    {id:uid(),name:'Conto trading 35.000€',target:35000,current:3500,category:'trading',deadline:'2025-12-31',notes:'Piano scalata Wyckoff',completed:false},
+    {id:uid(),name:'Fondo emergenza 6 mesi',target:12000,current:8500,category:'risparmio',deadline:'',notes:'',completed:false},
+    {id:uid(),name:'ETF S&P500 10.000€',target:10000,current:1750,category:'investimento',deadline:'2026-12-31',notes:'PAC mensile 350€',completed:false},
+  ]);
+  DB.set('loans',[
+    {id:uid(),name:'Prestito auto',type:'Finanziamento auto',totalAmount:18000,remaining:11500,monthlyPayment:320,rate:4.5,remainingMonths:36},
+  ]);
+  DB.set('diary',[
+    {id:uid(),date:today(),text:'Prima nota del diario. Oggi ho applicato la strategia Wyckoff sul gold, spring confermata sul 15M con volume anomalo. Trade long con R/R 2.4.',mood:3,lessons:'Aspettare sempre la conferma del volume prima di entrare.',tags:['trading','wyckoff','gold']},
+  ]);
+}
+
+nav('dashboard');
+</script>
+</body>
+</html>
